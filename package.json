@@ -1,15 +1,58 @@
 {
   "name": "football-tactics-hub",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "The ultimate football tactical analysis platform - analyze legendary teams and their tactical masterpieces",
+  "private": false,
+  "keywords": [
+    "football",
+    "soccer",
+    "tactics",
+    "analysis",
+    "visualization",
+    "formations",
+    "strategy",
+    "coaching",
+    "interactive",
+    "next.js",
+    "react",
+    "typescript"
+  ],
+  "author": {
+    "name": "Football Tactics Hub",
+    "email": "contact@footballtacticshub.com",
+    "url": "https://footballtacticshub.com"
+  },
+  "homepage": "https://footballtacticshub.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/football-tactics-hub.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/football-tactics-hub/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "clean": "rm -rf .next out",
+    "analyze": "cross-env ANALYZE=true npm run build",
+    "export": "next export",
+    "serve": "npm run build && npm run start",
+    "check-all": "npm run type-check && npm run lint && npm run format:check"
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "critters": "^0.0.23",
     "lucide-react": "^0.263.1",
     "next": "14.0.0",
     "react": "^18.2.0",
@@ -20,11 +63,36 @@
     "@types/node": "^20.8.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "autoprefixer": "^10.4.16",
+    "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
     "eslint": "^8.51.0",
     "eslint-config-next": "14.0.0",
-    "postcss": "^8.4.31",
-    "tailwindcss": "^3.3.5",
+    "postcss": "^8.5.6",
+    "prettier": "^3.0.3",
+    "prettier-plugin-tailwindcss": "^0.5.6",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.2.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "printWidth": 80,
+    "plugins": [
+      "prettier-plugin-tailwindcss"
+    ]
   }
 }
