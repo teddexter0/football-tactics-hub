@@ -47,6 +47,7 @@ export interface Team {
   primaryColor: string;
   secondaryColor: string;
   quote: string;
+  managerImage: string; // ← This was missing!
   phases: {
     0: GamePhase; // Kickoff
     1: GamePhase; // In Possession

@@ -2,13 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Edit3, Save, RotateCcw, Target, Zap, Users, Settings } from 'lucide-react';
-import { legendaryTeams } from '@/src/data/teams';
-import { oppositionFormations } from '@/src/data/formations';
-import { rolesByPosition, roleDescriptions } from '@/src/data/playerRoles';
-import { Team, Player, GamePhase } from '@/src/types/tactics';
-import { PITCH_DIMENSIONS, PLAYER_SIZES, PHASES } from '@/src/utils/constants';
-import { useTactics } from '@/src/hooks/useTactics';
-
+import { legendaryTeams } from '@/data/teams';
+import { oppositionFormations } from '@/data/formations';
+import { rolesByPosition, roleDescriptions } from '@/data/playerRoles';
+import { Team, Player, GamePhase } from '@/types/tactics';
+import { PITCH_DIMENSIONS, PLAYER_SIZES, PHASES } from '@/utils/constants';
+import { useTactics } from '@/hooks/useLocalStorage';
 export default function TacticsHub() {
   // State management
   const [selectedTeam, setSelectedTeam] = useState(0);
@@ -173,6 +172,15 @@ export default function TacticsHub() {
               disabled={editMode || selectedTeam === 0}
             />
             <div className="flex-1 text-center max-w-2xl">
+              {/* Manager Image */}
+              <div className="flex justify-center mb-4">
+                <img 
+                  src={currentTeam.managerImage} 
+                  alt={currentTeam.manager}
+                  className="w-24 h-24 rounded-full border-4 shadow-xl"
+                  style={{ borderColor: currentTeam.primaryColor }}
+                />
+              </div>
               <div className="team-name text-4xl font-black mb-2" style={{ color: currentTeam.primaryColor }}>
                 {currentTeam.name}
               </div>
@@ -754,7 +762,7 @@ export default function TacticsHub() {
             </div>
             
             <div className="mt-8 p-6 bg-gradient-to-r from-green-900/50 to-emerald-900/50 rounded-xl border-l-4 border-green-400">
-              <div className="font-black text-green-300 text-xl mb-3">💡 Master's Wisdom</div>
+              <div className="font-black text-green-300 text-xl mb-3">💡 Masters Wisdom</div>
               <div className="text-green-200 font-bold italic leading-relaxed">
                 Study how teams transform between phases - the greatest tactical minds master these transitions like conducting a symphony!
               </div>
