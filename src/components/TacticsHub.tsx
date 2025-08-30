@@ -372,7 +372,7 @@ export default function TacticsHub() {
               <circle cx="300" cy="450" r="4" fill="white"/>
               
               {/* Center line */}
-              <line x1="300" y1="50" x2="300" y2="850" stroke="white" strokeWidth="4"/>
+              <line x1="28" y1="450" x2="880" y2="450" stroke="white" strokeWidth="4"/>
               
               {/* Penalty areas */}
               <rect x="165" y="50" width="270" height="132" fill="none" stroke="white" strokeWidth="4"/>

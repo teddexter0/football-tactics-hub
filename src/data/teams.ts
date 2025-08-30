@@ -104,7 +104,7 @@ export const legendaryTeams: Team[] = [
     achievement: "Treble Winners - Premier League, FA Cup, Champions League",
     formation: "4-3-3 / 3-2-4-1",
     style: "Positional Play, Inverted Fullbacks, False 9 Revolution",
-    description: "The ultimate evolution of Pep's philosophy - inverted fullbacks creating midfield overloads, Haaland as the perfect false 9, and positional mastery that dismantled every opponent.",
+    description: "The ultimate evolution of Pep's philosophy - inverted fullbacks creating midfield overloads, Haaland as the perfect target Man, and positional mastery that dismantled every opponent.",
     primaryColor: "#6CABDD",
     secondaryColor: "#1C2C5B",
     quote: "We don't want the ball, we want the ball in the right place at the right time.",
@@ -128,21 +128,21 @@ export const legendaryTeams: Team[] = [
       1: {
         players: [
           { id: 31, name: "Ederson", position: "GK", x: 50, y: 90, role: "Sweeper Keeper", detail: "Acts as 11th outfield player - pings 60-yard passes to start attacks" },
-          { id: 2, name: "Walker", position: "RB", x: 35, y: 70, role: "Inverted Fullback", detail: "Tucks into midfield creating 3-2-4-1 formation" },
-          { id: 5, name: "Stones", position: "CB", x: 45, y: 75, role: "Stepping CB", detail: "Steps into midfield as auxiliary DM, distributes like a regista" },
-          { id: 25, name: "Akanji", position: "CB", x: 65, y: 80, role: "Wide CB", detail: "Drifts wide when Ake attacks, comfortable as auxiliary fullback" },
-          { id: 6, name: "Ake", position: "LB", x: 85, y: 55, role: "Attacking FB", detail: "Provides width when Grealish cuts inside, quality crosses" },
-          { id: 16, name: "Rodri", position: "CDM", x: 55, y: 65, role: "Deep Playmaker", detail: "Drops between CBs in build-up, anchors the system" },
-          { id: 17, name: "De Bruyne", position: "CM", x: 25, y: 45, role: "Advanced Playmaker", detail: "Occupies right half-space, creative genius with impossible passes" },
-          { id: 8, name: "Gündogan", position: "CM", x: 70, y: 50, role: "Roaming 8", detail: "Finds pockets between lines, ghosting into box with perfect timing" },
+          { id: 2, name: "Walker", position: "RB", x: 15, y: 70, role: "Inverted Fullback", detail: "Tucks into midfield creating 3-2-4-1 formation" },
+          { id: 5, name: "Stones", position: "CB", x: 35, y: 59, role: "Stepping CB", detail: "Steps into midfield as auxiliary DM, distributes like a regista" },
+          { id: 25, name: "Akanji", position: "CB", x: 48, y: 70, role: "Wide CB", detail: "Drifts wide when Ake attacks, comfortable as auxiliary fullback" },
+          { id: 6, name: "Ake", position: "LB", x: 85, y: 65, role: "Attacking FB", detail: "Provides width when Grealish cuts inside, quality crosses" },
+          { id: 16, name: "Rodri", position: "CDM", x: 65, y: 55, role: "Deep Playmaker", detail: "Drops between CBs in build-up, anchors the system" },
+          { id: 17, name: "De Bruyne", position: "CM", x: 35, y: 35, role: "Advanced Playmaker", detail: "Occupies right half-space, creative genius with impossible passes" },
+          { id: 8, name: "Gündogan", position: "CM", x: 70, y: 35, role: "Roaming 8", detail: "Finds pockets between lines, ghosting into box with perfect timing" },
           { id: 26, name: "Mahrez", position: "RW", x: 15, y: 30, role: "Inverted Winger", detail: "Cuts inside creating central overloads, left foot is deadly" },
           { id: 9, name: "Haaland", position: "ST", x: 50, y: 20, role: "Target Man", detail: "Pins backline, creates space for others even when marked" },
-          { id: 10, name: "Grealish", position: "LW", x: 75, y: 25, role: "Wide Playmaker", detail: "Hugs touchline then cuts inside, draws 2-3 players with dribbling" }
+          { id: 10, name: "Grealish", position: "LW", x: 95, y: 25, role: "Wide Playmaker", detail: "Hugs touchline then cuts inside, draws 2-3 players with dribbling" }
         ],
         movements: [
-          { from: { x: 15, y: 75 }, to: { x: 35, y: 70 }, type: 'movement', player: 'Walker Inverts', color: '#6CABDD' },
-          { from: { x: 85, y: 75 }, to: { x: 85, y: 55 }, type: 'movement', player: 'Ake Attacks', color: '#6CABDD' },
-          { from: { x: 50, y: 25 }, to: { x: 45, y: 35 }, type: 'movement', player: 'Haaland Drops', color: '#FFD700' }
+          { from: { x: 15, y: 65 }, to: { x: 22, y: 50 }, type: 'movement', player: 'Ake Inverts', color: '#6CABDD' },
+          { from: { x: 85, y: 75 }, to: { x: 85, y: 55 }, type: 'movement', player: 'Walker Attacks the Space Left Behind', color: '#6CABDD' },
+          { from: { x: 50, y: 25 }, to: { x: 50, y: 10 }, type: 'movement', player: 'Haaland Pins Backline', color: 'red' }
         ],
         zones: [
           { x: 20, y: 35, width: 35, height: 25, color: 'rgba(108, 171, 221, 0.3)', label: 'Right Half-Space Overload' },
@@ -173,10 +173,10 @@ export const legendaryTeams: Team[] = [
           {
             name: "Overload Near Post",
             players: [
-              { id: 5, name: "Stones", position: "CB", x: 85, y: 80, role: "Near Post Target", detail: "Attacks near post with aggression and timing" },
-              { id: 9, name: "Haaland", position: "ST", x: 82, y: 78, role: "Primary Threat", detail: "Unstoppable in air, causes chaos in box" },
-              { id: 25, name: "Akanji", position: "CB", x: 75, y: 82, role: "Secondary Target", detail: "Arrives late with power header" },
-              { id: 17, name: "De Bruyne", position: "CM", x: 95, y: 85, role: "Corner Specialist", detail: "Pinpoint delivery with both feet" }
+              { id: 5, name: "Stones", position: "CB", x: 65, y: 82, role: "Near Post Target", detail: "Attacks near post with aggression and timing" },
+              { id: 9, name: "Haaland", position: "ST", x: 52, y: 90, role: "Primary Threat", detail: "Unstoppable in air, causes chaos in box" },
+              { id: 25, name: "Akanji", position: "CB", x: 55, y: 80, role: "Secondary Target", detail: "Arrives late with power header" },
+              { id: 17, name: "De Bruyne", position: "CM", x: 105, y: 85, role: "Corner Specialist", detail: "Pinpoint delivery with both feet" }
             ],
             opposition: [
               { x: 50, y: 90, role: "GK" }, { x: 88, y: 82, role: "Defender" }, 
@@ -309,8 +309,8 @@ export const legendaryTeams: Team[] = [
         players: [
           { id: 1, name: "Alisson", position: "GK", x: 50, y: 88, role: "Distribution GK", detail: "Quick distribution starts counter-attacks instantly" },
           { id: 66, name: "Alexander-Arnold", position: "RB", x: 8, y: 45, role: "Wing-Back", detail: "Essentially right winger creating havoc with crosses" },
-          { id: 4, name: "Van Dijk", position: "CB", x: 40, y: 78, role: "Ball-Playing CB", detail: "Pings 50-yard passes to wingers with precision" },
-          { id: 12, name: "Gomez", position: "CB", x: 60, y: 78, role: "Covering CB", detail: "Uses pace to cover spaces when fullbacks attack" },
+          { id: 4, name: "Van Dijk", position: "CB", x: 30, y: 78, role: "Ball-Playing CB", detail: "Pings 50-yard passes to wingers with precision" },
+          { id: 12, name: "Gomez", position: "CB", x: 70, y: 78, role: "Covering CB", detail: "Uses pace to cover spaces when fullbacks attack" },
           { id: 26, name: "Robertson", position: "LB", x: 92, y: 45, role: "Attack FB", detail: "Hugs touchline, relentless overlapping runs" },
           { id: 3, name: "Fabinho", position: "CDM", x: 50, y: 68, role: "Defensive Anchor", detail: "Covers for both fullbacks, launches quick transitions" },
           { id: 14, name: "Henderson", position: "CM", x: 28, y: 55, role: "Box-to-Box", detail: "Covers every blade of grass, switches play perfectly" },
@@ -578,8 +578,8 @@ export const legendaryTeams: Team[] = [
           { id: 6, name: "Morgan", position: "CB", x: 40, y: 78, role: "Long Ball CB", detail: "Pings long balls to Vardy's runs" },
           { id: 5, name: "Huth", position: "CB", x: 60, y: 78, role: "Physical CB", detail: "Wins headers, starts attacks" },
           { id: 28, name: "Fuchs", position: "LB", x: 88, y: 65, role: "Overlapping LB", detail: "Bombs forward creating width" },
-          { id: 14, name: "Kanté", position: "CDM", x: 45, y: 70, role: "Ball Winner", detail: "Wins ball, launches immediate counters" },
-          { id: 4, name: "Drinkwater", position: "CM", x: 55, y: 70, role: "Counter Specialist", detail: "Perfect passes to start lightning breaks" },
+          { id: 14, name: "Kanté", position: "CDM", x: 35, y: 60, role: "Ball Winner", detail: "Wins ball, launches immediate counters" },
+          { id: 4, name: "Drinkwater", position: "CM", x: 65, y: 60, role: "Counter Specialist", detail: "Perfect passes to start lightning breaks" },
           { id: 26, name: "Mahrez", position: "RM", x: 25, y: 45, role: "Creative Winger", detail: "Algerian magic creating chances from nothing" },
           { id: 10, name: "Albrighton", position: "LM", x: 75, y: 45, role: "Crossing Specialist", detail: "Perfect crosses for Vardy and Okazaki" },
           { id: 20, name: "Okazaki", position: "ST", x: 40, y: 20, role: "False 9", detail: "Drops deep creating space for Vardy" },
@@ -744,29 +744,29 @@ export const legendaryTeams: Team[] = [
           { id: 33, name: "Zaïre-Emery", position: "CDM", x: 50, y: 65, role: "Deep Playmaker", detail: "French wonderkid controlling the tempo" },
           { id: 8, name: "Ruiz", position: "CM", x: 35, y: 55, role: "Box-to-Box", detail: "Spanish engine covering every blade of grass" },
           { id: 17, name: "Vitinha", position: "CM", x: 65, y: 55, role: "Creative Mid", detail: "Portuguese magic between the lines" },
-          { id: 7, name: "Mbappé", position: "RW", x: 20, y: 40, role: "Inside Forward", detail: "French phenomenon with devastating pace" },
-          { id: 9, name: "Gonçalo Ramos", position: "ST", x: 50, y: 25, role: "Complete Striker", detail: "Portuguese striker with perfect movement" },
+          { id: 7, name: "D.Doue", position: "RW", x: 20, y: 40, role: "Inside Forward", detail: "French phenomenon with devastating pace" },
+          { id: 9, name: "Dembele", position: "ST", x: 50, y: 45, role: "False-9", detail: "Occupying half-spaces and dangerous in pockets" },
           { id: 29, name: "Barcola", position: "LW", x: 80, y: 40, role: "Wide Forward", detail: "French talent stretching defenses" }
         ]
       },
       1: {
         players: [
           { id: 99, name: "Donnarumma", position: "GK", x: 50, y: 88, role: "Playing GK", detail: "Italian precision starting attacks from deep" },
-          { id: 2, name: "Hakimi", position: "RB", x: 8, y: 50, role: "Wing-Back", detail: "Creates width when Mbappé cuts inside" },
+          { id: 2, name: "Hakimi", position: "RB", x: 8, y: 50, role: "Wing-Back", detail: "Creates width when D.Doue cuts inside" },
           { id: 4, name: "Marquinhos", position: "CB", x: 35, y: 75, role: "Progressive CB", detail: "Steps forward with ball confidently" },
           { id: 15, name: "Danilo", position: "CB", x: 65, y: 75, role: "Playmaker CB", detail: "Portuguese passing range from defense" },
           { id: 25, name: "Mendes", position: "LB", x: 92, y: 50, role: "Attacking LB", detail: "Overlaps Barcola creating overloads" },
           { id: 33, name: "Zaïre-Emery", position: "CDM", x: 50, y: 70, role: "Pivot", detail: "French genius dropping between center-backs" },
           { id: 8, name: "Ruiz", position: "CM", x: 30, y: 55, role: "Interior Right", detail: "Spanish intelligence in half-spaces" },
           { id: 17, name: "Vitinha", position: "CM", x: 70, y: 55, role: "Interior Left", detail: "Portuguese creativity unlocking defenses" },
-          { id: 7, name: "Mbappé", position: "RW", x: 25, y: 25, role: "Inside Forward", detail: "Cuts inside for devastating left foot" },
-          { id: 9, name: "Gonçalo Ramos", position: "ST", x: 50, y: 20, role: "Target Man", detail: "Holds up play and creates space" },
+          { id: 7, name: "D.Doue", position: "RW", x: 25, y: 25, role: "Inside Forward", detail: "Cuts inside for devastating left foot" },
+          { id: 9, name: "Dembele", position: "ST", x: 50, y: 40, role: "False-9", detail: "Creates space" },
           { id: 29, name: "Barcola", position: "LW", x: 75, y: 25, role: "Direct Winger", detail: "French pace stretching defense wide" }
         ],
         movements: [
-          { from: { x: 15, y: 75 }, to: { x: 8, y: 50 }, type: 'movement', player: 'Hakimi Bombs', color: '#004170' },
-          { from: { x: 20, y: 40 }, to: { x: 25, y: 25 }, type: 'movement', player: 'Mbappé Cuts Inside', color: '#ED1C24' },
-          { from: { x: 85, y: 75 }, to: { x: 92, y: 50 }, type: 'movement', player: 'Mendes Overlaps', color: '#004170' }
+          { from: { x: 15, y: 75 }, to: { x: 8, y: 50 }, type: 'movement', player: 'Mendes Bombs', color: '#004170' },
+          { from: { x: 50, y: 40 }, to: { x: 50, y: 20 }, type: 'movement', player: 'Ousmanne teases space', color: '#ED1C24' },
+          { from: { x: 85, y: 75 }, to: { x: 92, y: 50 }, type: 'movement', player: 'Hakimi Overlaps', color: '#004170' }
         ],
         zones: [
           { x: 15, y: 15, width: 70, height: 30, color: 'rgba(0, 65, 112, 0.3)', label: 'PSG Attack Zone - Unstoppable' },
@@ -783,8 +783,8 @@ export const legendaryTeams: Team[] = [
           { id: 33, name: "Zaïre-Emery", position: "CDM", x: 50, y: 65, role: "Press Resistant", detail: "French composure under any pressure" },
           { id: 8, name: "Ruiz", position: "CM", x: 35, y: 55, role: "Pressing Mid", detail: "Spanish intensity in defensive phases" },
           { id: 17, name: "Vitinha", position: "CM", x: 65, y: 55, role: "Defensive Mid", detail: "Portuguese work rate for the team" },
-          { id: 7, name: "Mbappé", position: "RW", x: 25, y: 45, role: "Tracking Star", detail: "Even the superstar pressed for Luis Enrique" },
-          { id: 9, name: "Gonçalo Ramos", position: "ST", x: 50, y: 35, role: "Pressing Forward", detail: "Portuguese striker leading from front" },
+          { id: 7, name: "D.Doue", position: "RW", x: 25, y: 45, role: "Tracking Star", detail: "Rising young superstar pressed for Luis Enrique" },
+          { id: 9, name: "Dembele", position: "ST", x: 50, y: 35, role: "Pressing Forward", detail: "French phenom leading from front" },
           { id: 29, name: "Barcola", position: "LW", x: 75, y: 45, role: "Defensive Winger", detail: "French talent working back religiously" }
         ],
         zones: [
@@ -798,7 +798,7 @@ export const legendaryTeams: Team[] = [
             players: [
               { id: 4, name: "Marquinhos", position: "CB", x: 85, y: 82, role: "Captain Leader", detail: "Brazilian captain dangerous at set pieces" },
               { id: 15, name: "Danilo", position: "CB", x: 78, y: 78, role: "Aerial Threat", detail: "Portuguese defender with perfect timing" },
-              { id: 9, name: "Gonçalo Ramos", position: "ST", x: 82, y: 75, role: "Box Predator", detail: "Portuguese striker finding space everywhere" },
+              { id: 9, name: "Dembele", position: "ST", x: 82, y: 75, role: "Box Predator", detail: "French phenom finding space everywhere" },
               { id: 17, name: "Vitinha", position: "CM", x: 95, y: 85, role: "Set Piece Master", detail: "Portuguese precision from dead balls" }
             ],
             opposition: [
