@@ -1,7 +1,7 @@
  # ⚽ Football Tactics Hub
 
 > **The Ultimate Football Tactical Analysis Platform**
-> 
+> Are you a football fanatic, then this is the place to brainstorm tactical insights! Learn from the pinnacle prosperers from the past and patch your own tactics!
 > Analyze legendary football teams and their tactical masterpieces through interactive visualizations, detailed player roles, and comprehensive phase-by-phase breakdowns.
 
 ![Football Tactics Hub](https://img.shields.io/badge/Football-Tactics%20Hub-green?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJtOCAxNCA2LTYiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Im0xNCA4LTYgNiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+)
@@ -11,6 +11,13 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.3-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-FF99CC?style=for-the-badge)](https://football-tactics-hub.vercel.app/)
+[![Screenshot 1](https://img.shields.io/badge/Screenshot%201-FF99CC?style=for-the-badge)](/assets/screenshot(1).png)
+[![Screenshot 2](https://img.shields.io/badge/Screenshot%202-FF99CC?style=for-the-badge)](/assets/screenshot(2).png)
+[![Screenshot 3](https://img.shields.io/badge/Screenshot%201-FF99CC?style=for-the-badge)](/assets/screenshot(3).png)
+[![Screenshot 4](https://img.shields.io/badge/Screenshot%202-FF99CC?style=for-the-badge)](/assets/screenshot(4).png)
 
 ## 🌟 Features
 
