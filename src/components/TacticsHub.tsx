@@ -5,9 +5,10 @@ import { ChevronLeft, ChevronRight, Edit3, Save, RotateCcw, Target, Zap, Users, 
 import { legendaryTeams } from '@/data/teams';
 import { oppositionFormations } from '@/data/formations';
 import { rolesByPosition, roleDescriptions } from '@/data/playerRoles';
-import { Team, Player, GamePhase } from '@/types/tactics';
+import { Team, Player, GamePhase, Movement, TacticalZone } from '@/types/tactics';
 import { PITCH_DIMENSIONS, PLAYER_SIZES, PHASES } from '@/utils/constants';
 import { useTactics } from '@/hooks/useLocalStorage';
+
 export default function TacticsHub() {
   // State management
   const [selectedTeam, setSelectedTeam] = useState(0);
@@ -20,6 +21,14 @@ export default function TacticsHub() {
   const [showZones, setShowZones] = useState(false);
   const [oppositionFormation, setOppositionFormation] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Custom tactics editing states
+  const [editingMode, setEditingMode] = useState<'players' | 'arrows' | 'zones' | 'info' | 'formation'>('formation');
+  const [arrowStart, setArrowStart] = useState<{x: number, y: number, playerId?: number} | null>(null);
+  const [zoneStart, setZoneStart] = useState<{x: number, y: number} | null>(null);
+  const [customDescription, setCustomDescription] = useState('');
+  const [customName, setCustomName] = useState('');
+  const [customManager, setCustomManager] = useState('');
 
   // Custom tactics hook
   const { customTactic, setCustomTactic, updatePlayerPosition, updatePlayerRole, saveCurrentTactic } = useTactics();
@@ -32,6 +41,75 @@ export default function TacticsHub() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Formation templates
+  const formations = {
+    '4-3-3': [
+      { id: 1, name: "GK", position: "GK", x: 50, y: 10, role: "Sweeper Keeper" },
+      { id: 2, name: "RB", position: "RB", x: 20, y: 25, role: "Attacking FB" },
+      { id: 3, name: "CB", position: "CB", x: 40, y: 20, role: "Ball-Playing CB" },
+      { id: 4, name: "CB", position: "CB", x: 60, y: 20, role: "Stopper" },
+      { id: 5, name: "LB", position: "LB", x: 80, y: 25, role: "Wing-Back" },
+      { id: 6, name: "CDM", position: "CDM", x: 50, y: 35, role: "Anchor Man" },
+      { id: 7, name: "CM", position: "CM", x: 35, y: 45, role: "Box-to-Box" },
+      { id: 8, name: "CM", position: "CM", x: 65, y: 45, role: "Advanced Playmaker" },
+      { id: 9, name: "RW", position: "RW", x: 20, y: 60, role: "Inverted Winger" },
+      { id: 10, name: "ST", position: "ST", x: 50, y: 70, role: "False 9" },
+      { id: 11, name: "LW", position: "LW", x: 80, y: 60, role: "Wide Playmaker" }
+    ],
+    '4-4-2': [
+      { id: 1, name: "GK", position: "GK", x: 50, y: 10, role: "Sweeper Keeper" },
+      { id: 2, name: "RB", position: "RB", x: 20, y: 25, role: "Attacking FB" },
+      { id: 3, name: "CB", position: "CB", x: 40, y: 20, role: "Ball-Playing CB" },
+      { id: 4, name: "CB", position: "CB", x: 60, y: 20, role: "Stopper" },
+      { id: 5, name: "LB", position: "LB", x: 80, y: 25, role: "Wing-Back" },
+      { id: 6, name: "RM", position: "RM", x: 20, y: 50, role: "Right Winger" },
+      { id: 7, name: "CM", position: "CM", x: 40, y: 45, role: "Box-to-Box" },
+      { id: 8, name: "CM", position: "CM", x: 60, y: 45, role: "Deep Playmaker" },
+      { id: 9, name: "LM", position: "LM", x: 80, y: 50, role: "Left Winger" },
+      { id: 10, name: "ST", position: "ST", x: 45, y: 70, role: "Target Man" },
+      { id: 11, name: "ST", position: "ST", x: 55, y: 70, role: "Poacher" }
+    ],
+    '3-5-2': [
+      { id: 1, name: "GK", position: "GK", x: 50, y: 10, role: "Sweeper Keeper" },
+      { id: 2, name: "RCB", position: "RCB", x: 30, y: 20, role: "Ball-Playing CB" },
+      { id: 3, name: "CB", position: "CB", x: 50, y: 18, role: "Stopper" },
+      { id: 4, name: "LCB", position: "LCB", x: 70, y: 20, role: "Covering CB" },
+      { id: 5, name: "RWB", position: "RWB", x: 10, y: 45, role: "Right Wing-Back" },
+      { id: 6, name: "CDM", position: "CDM", x: 40, y: 40, role: "Defensive Screen" },
+      { id: 7, name: "CM", position: "CM", x: 50, y: 50, role: "Box-to-Box" },
+      { id: 8, name: "CDM", position: "CDM", x: 60, y: 40, role: "Deep Playmaker" },
+      { id: 9, name: "LWB", position: "LWB", x: 90, y: 45, role: "Left Wing-Back" },
+      { id: 10, name: "ST", position: "ST", x: 45, y: 70, role: "Target Man" },
+      { id: 11, name: "ST", position: "ST", x: 55, y: 70, role: "Support Striker" }
+    ],
+    '4-2-3-1': [
+      { id: 1, name: "GK", position: "GK", x: 50, y: 10, role: "Sweeper Keeper" },
+      { id: 2, name: "RB", position: "RB", x: 20, y: 25, role: "Attacking FB" },
+      { id: 3, name: "CB", position: "CB", x: 40, y: 20, role: "Ball-Playing CB" },
+      { id: 4, name: "CB", position: "CB", x: 60, y: 20, role: "Stopper" },
+      { id: 5, name: "LB", position: "LB", x: 80, y: 25, role: "Wing-Back" },
+      { id: 6, name: "CDM", position: "CDM", x: 40, y: 35, role: "Anchor Man" },
+      { id: 7, name: "CDM", position: "CDM", x: 60, y: 35, role: "Deep Playmaker" },
+      { id: 8, name: "RM", position: "RM", x: 20, y: 55, role: "Right Midfielder" },
+      { id: 9, name: "CAM", position: "CAM", x: 50, y: 55, role: "Attacking Midfielder" },
+      { id: 10, name: "LM", position: "LM", x: 80, y: 55, role: "Left Midfielder" },
+      { id: 11, name: "ST", position: "ST", x: 50, y: 70, role: "Complete Forward" }
+    ],
+    '3-4-3': [
+      { id: 1, name: "GK", position: "GK", x: 50, y: 10, role: "Sweeper Keeper" },
+      { id: 2, name: "RCB", position: "RCB", x: 30, y: 20, role: "Ball-Playing CB" },
+      { id: 3, name: "CB", position: "CB", x: 50, y: 18, role: "Stopper" },
+      { id: 4, name: "LCB", position: "LCB", x: 70, y: 20, role: "Covering CB" },
+      { id: 5, name: "RWB", position: "RWB", x: 15, y: 45, role: "Right Wing-Back" },
+      { id: 6, name: "CM", position: "CM", x: 40, y: 40, role: "Box-to-Box" },
+      { id: 7, name: "CM", position: "CM", x: 60, y: 40, role: "Deep Playmaker" },
+      { id: 8, name: "LWB", position: "LWB", x: 85, y: 45, role: "Left Wing-Back" },
+      { id: 9, name: "RW", position: "RW", x: 25, y: 65, role: "Inside Forward" },
+      { id: 10, name: "ST", position: "ST", x: 50, y: 70, role: "False 9" },
+      { id: 11, name: "LW", position: "LW", x: 75, y: 65, role: "Wide Forward" }
+    ]
+  };
+
   // Helper functions
   const getPositionSpecificRoles = useCallback((position: string): string[] => {
     return rolesByPosition[position as keyof typeof rolesByPosition] || ['Custom Role'];
@@ -41,57 +119,166 @@ export default function TacticsHub() {
     return roleDescriptions[role as keyof typeof roleDescriptions] || 'Custom tactical role';
   }, []);
 
-  // Team and phase management
-  const currentTeam = customTactic && editMode ? customTactic : legendaryTeams[selectedTeam];
-  const currentPhase = gamePhase === 3 && currentTeam.phases[3] ? 
-    currentTeam.phases[3].corners[selectedCornerType] : 
-    currentTeam.phases[gamePhase as keyof typeof currentTeam.phases];
+  // Apply formation template
+  const applyFormation = useCallback((formationName: string) => {
+    if (formations[formationName as keyof typeof formations]) {
+      const template = formations[formationName as keyof typeof formations];
+      const playersWithDetails = template.map(player => ({
+        ...player,
+        detail: getRoleDescription(player.role)
+      }));
+
+      const newTactic: Team = {
+        name: customName || "Custom Tactic",
+        manager: customManager || "You",
+        formation: formationName,
+        style: "Your Style",
+        description: customDescription || `Your custom ${formationName} tactical setup - drag players, assign roles, add arrows and zones to create your masterpiece!`,
+        primaryColor: "#9333EA",
+        secondaryColor: "#7C3AED",
+        achievement: "Custom Formation",
+        quote: "Tactics are like a puzzle - every piece must fit perfectly.",
+        managerImage: "/managers/custom.jpg",
+        phases: {
+          0: { players: playersWithDetails, movements: [], zones: [] },
+          1: { players: playersWithDetails.map(p => ({...p})), movements: [], zones: [] },
+          2: { players: playersWithDetails.map(p => ({...p})), movements: [], zones: [] },
+          3: { corners: [{ name: "Custom Corner", players: [], opposition: [] }] }
+        }
+      };
+      setCustomTactic(newTactic);
+      setEditingMode('players');
+    }
+  }, [setCustomTactic, getRoleDescription, customName, customManager, customDescription]);
 
   // Custom tactic creation
   const createCustomTactic = useCallback(() => {
-    const newTactic: Team = {
-      name: "Custom Tactic",
-      manager: "You",
-      formation: "4-3-3",
-      style: "Your Style",
-      description: "Your custom tactical setup - drag players, assign roles, create your masterpiece!",
-      primaryColor: "#9333EA",
-      secondaryColor: "#7C3AED",
-      achievement: "Custom Formation",
-      quote: "Tactics are like a puzzle - every piece must fit perfectly.",
-      managerImage: "/managers/custom.jpg",
-      phases: {
-        0: {
-          players: [
-            { id: 1, name: "GK", position: "GK", x: 50, y: 10, role: "Sweeper Keeper", detail: getRoleDescription("Sweeper Keeper") },
-            { id: 2, name: "RB", position: "RB", x: 20, y: 25, role: "Attacking FB", detail: getRoleDescription("Attacking FB") },
-            { id: 3, name: "CB", position: "CB", x: 40, y: 20, role: "Ball-Playing CB", detail: getRoleDescription("Ball-Playing CB") },
-            { id: 4, name: "CB", position: "CB", x: 60, y: 20, role: "Stopper", detail: getRoleDescription("Stopper") },
-            { id: 5, name: "LB", position: "LB", x: 80, y: 25, role: "Wing-Back", detail: getRoleDescription("Wing-Back") },
-            { id: 6, name: "CDM", position: "CDM", x: 50, y: 35, role: "Anchor Man", detail: getRoleDescription("Anchor Man") },
-            { id: 7, name: "CM", position: "CM", x: 35, y: 45, role: "Box-to-Box", detail: getRoleDescription("Box-to-Box") },
-            { id: 8, name: "CM", position: "CM", x: 65, y: 45, role: "Advanced Playmaker", detail: getRoleDescription("Advanced Playmaker") },
-            { id: 9, name: "RW", position: "RW", x: 20, y: 60, role: "Inverted Winger", detail: getRoleDescription("Inverted Winger") },
-            { id: 10, name: "ST", position: "ST", x: 50, y: 70, role: "False 9", detail: getRoleDescription("False 9") },
-            { id: 11, name: "LW", position: "LW", x: 80, y: 60, role: "Wide Playmaker", detail: getRoleDescription("Wide Playmaker") }
-          ]
-        },
-        1: { players: [] },
-        2: { players: [] },
-        3: { corners: [{ name: "Custom Corner", players: [], opposition: [] }] }
-      }
-    };
-    setCustomTactic(newTactic);
     setEditMode(true);
-  }, [setCustomTactic, getRoleDescription]);
+    setEditingMode('formation');
+  }, []);
+
+  // Add movement arrow
+  const addMovementArrow = useCallback((from: {x: number, y: number}, to: {x: number, y: number}, playerId?: number) => {
+    if (customTactic && gamePhase !== 3) {
+      const player = (customTactic.phases[gamePhase as keyof typeof customTactic.phases] as GamePhase).players?.find(p => p.id === playerId);
+      const newMovement: Movement = {
+        from,
+        to,
+        type: 'movement',
+        player: player?.name || `Movement ${Date.now()}`,
+        color: '#FFD700'
+      };
+
+      const currentPhase = customTactic.phases[gamePhase as keyof typeof customTactic.phases] as GamePhase;
+      const updatedPhase = {
+        ...currentPhase,
+        movements: [...(currentPhase.movements || []), newMovement]
+      };
+
+      const updatedTactic = {
+        ...customTactic,
+        phases: { ...customTactic.phases, [gamePhase]: updatedPhase }
+      };
+
+      setCustomTactic(updatedTactic);
+    }
+  }, [customTactic, gamePhase, setCustomTactic]);
+
+  // Add tactical zone
+  const addTacticalZone = useCallback((x: number, y: number, width: number, height: number, label: string) => {
+    if (customTactic && gamePhase !== 3) {
+      const newZone: TacticalZone = {
+        x,
+        y,
+        width,
+        height,
+        color: 'rgba(147, 51, 234, 0.3)',
+        label
+      };
+
+      const currentPhase = customTactic.phases[gamePhase as keyof typeof customTactic.phases] as GamePhase;
+      const updatedPhase = {
+        ...currentPhase,
+        zones: [...(currentPhase.zones || []), newZone]
+      };
+
+      const updatedTactic = {
+        ...customTactic,
+        phases: { ...customTactic.phases, [gamePhase]: updatedPhase }
+      };
+
+      setCustomTactic(updatedTactic);
+    }
+  }, [customTactic, gamePhase, setCustomTactic]);
+
+  // Handle pitch clicks for arrows and zones
+  const handlePitchClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!editMode || !customTactic) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+    
+    // Get responsive dimensions
+    const marginX = isMobile ? 10 : 30;
+    const marginY = isMobile ? 17.5 : 50;
+    const fieldWidth = rect.width - (marginX * 2);
+    const fieldHeight = rect.height - (marginY * 2);
+    
+    // Convert to percentage
+    const percentX = Math.max(0, Math.min(100, ((clickX - marginX) / fieldWidth) * 100));
+    const percentY = Math.max(0, Math.min(100, ((clickY - marginY) / fieldHeight) * 100));
+
+    if (editingMode === 'arrows') {
+      if (!arrowStart) {
+        setArrowStart({ x: percentX, y: percentY });
+      } else {
+        addMovementArrow(arrowStart, { x: percentX, y: percentY });
+        setArrowStart(null);
+      }
+    } else if (editingMode === 'zones') {
+      if (!zoneStart) {
+        setZoneStart({ x: percentX, y: percentY });
+      } else {
+        const width = Math.abs(percentX - zoneStart.x);
+        const height = Math.abs(percentY - zoneStart.y);
+        const x = Math.min(percentX, zoneStart.x);
+        const y = Math.min(percentY, zoneStart.y);
+        
+        const label = prompt('Enter zone label:') || 'Tactical Zone';
+        addTacticalZone(x, y, width, height, label);
+        setZoneStart(null);
+      }
+    }
+  }, [editMode, customTactic, editingMode, arrowStart, zoneStart, addMovementArrow, addTacticalZone, isMobile]);
+
+  // Handle player clicks in arrow mode
+  const handlePlayerClick = useCallback((playerId: number) => {
+    if (editingMode === 'arrows' && editMode && customTactic) {
+      const player = (customTactic.phases[gamePhase as keyof typeof customTactic.phases] as GamePhase).players?.find(p => p.id === playerId);
+      if (player) {
+        if (!arrowStart) {
+          setArrowStart({ x: 100 - player.x, y: player.y, playerId });
+        } else {
+          addMovementArrow(arrowStart, { x: 100 - player.x, y: player.y }, playerId);
+          setArrowStart(null);
+        }
+      }
+    }
+  }, [editingMode, editMode, customTactic, gamePhase, arrowStart, addMovementArrow]);
 
   // Player position update
   const handlePlayerDragEnd = useCallback((playerId: number, e: React.DragEvent) => {
-    if (editMode && customTactic && gamePhase !== 3) {
+    if (editMode && customTactic && gamePhase !== 3 && editingMode === 'players') {
       const rect = e.currentTarget.parentElement?.parentElement?.getBoundingClientRect();
       if (rect) {
-        const newX = ((e.clientX - rect.left - PITCH_DIMENSIONS.marginX) / PITCH_DIMENSIONS.fieldWidth) * 100;
-        const newY = ((e.clientY - rect.top - PITCH_DIMENSIONS.marginY) / PITCH_DIMENSIONS.fieldHeight) * 100;
+        const marginX = isMobile ? 10 : 30;
+        const marginY = isMobile ? 17.5 : 50;
+        const fieldWidth = rect.width - (marginX * 2);
+        const fieldHeight = rect.height - (marginY * 2);
+        
+        const newX = ((e.clientX - rect.left - marginX) / fieldWidth) * 100;
+        const newY = ((e.clientY - rect.top - marginY) / fieldHeight) * 100;
         const boundedX = Math.max(0, Math.min(100, newX));
         const boundedY = Math.max(0, Math.min(100, newY));
         
@@ -99,7 +286,7 @@ export default function TacticsHub() {
         setCustomTactic(updatedTactic);
       }
     }
-  }, [editMode, customTactic, gamePhase, updatePlayerPosition, setCustomTactic]);
+  }, [editMode, customTactic, gamePhase, updatePlayerPosition, setCustomTactic, isMobile, editingMode]);
 
   // Role update
   const handleRoleChange = useCallback((playerId: number, newRole: string, position: string) => {
@@ -117,6 +304,12 @@ export default function TacticsHub() {
       alert('🎯 Tactic saved successfully!');
     }
   }, [customTactic, saveCurrentTactic]);
+
+  // Team and phase management
+  const currentTeam = customTactic && editMode ? customTactic : legendaryTeams[selectedTeam];
+  const currentPhase = gamePhase === 3 && currentTeam.phases[3] ? 
+    currentTeam.phases[3].corners[selectedCornerType] : 
+    currentTeam.phases[gamePhase as keyof typeof currentTeam.phases];
 
   // Navigation with style
   const NavigationButton = ({ direction, onClick, disabled }: { 
@@ -267,7 +460,10 @@ export default function TacticsHub() {
                   Save Tactics
                 </button>
                 <button
-                  onClick={() => setEditMode(false)}
+                  onClick={() => {
+                    setEditMode(false);
+                    setEditingMode('formation');
+                  }}
                   className="flex items-center gap-3 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 px-8 py-4 rounded-xl transition-all font-black text-lg shadow-xl hover:shadow-2xl transform hover:scale-105"
                 >
                   <RotateCcw size={24} />
@@ -276,6 +472,85 @@ export default function TacticsHub() {
               </div>
             )}
           </div>
+
+          {/* Editing Mode Buttons - Show when in edit mode */}
+          {editMode && customTactic && (
+            <div className="flex gap-2 bg-black/30 backdrop-blur-sm rounded-xl p-2 border-2 border-purple-500/50">
+              <button
+                onClick={() => setEditingMode('formation')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-bold ${
+                  editingMode === 'formation' 
+                    ? 'bg-orange-600 text-white' 
+                    : 'bg-black/40 text-orange-300 hover:bg-orange-700/30'
+                }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                Formation
+              </button>
+              <button
+                onClick={() => setEditingMode('players')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-bold ${
+                  editingMode === 'players' 
+                    ? 'bg-purple-600 text-white' 
+                    : 'bg-black/40 text-purple-300 hover:bg-purple-700/30'
+                }`}
+              >
+                <Users size={18} />
+                Players
+              </button>
+              <button
+                onClick={() => setEditingMode('arrows')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-bold ${
+                  editingMode === 'arrows' 
+                    ? 'bg-yellow-600 text-white' 
+                    : 'bg-black/40 text-yellow-300 hover:bg-yellow-700/30'
+                }`}
+              >
+                <Zap size={18} />
+                Arrows
+              </button>
+              <button
+                onClick={() => setEditingMode('zones')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-bold ${
+                  editingMode === 'zones' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-black/40 text-blue-300 hover:bg-blue-700/30'
+                }`}
+              >
+                <Target size={18} />
+                Zones
+              </button>
+              <button
+                onClick={() => setEditingMode('info')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-bold ${
+                  editingMode === 'info' 
+                    ? 'bg-green-600 text-white' 
+                    : 'bg-black/40 text-green-300 hover:bg-green-700/30'
+                }`}
+              >
+                <Settings size={18} />
+                Info
+              </button>
+            </div>
+          )}
+
+          {/* Mode Instructions */}
+          {editMode && (
+            <div className="bg-black/30 backdrop-blur-sm rounded-xl p-4 border-2 border-purple-500/30 max-w-md">
+              <div className="text-purple-300 font-bold text-sm mb-2">Current Mode: {editingMode.toUpperCase()}</div>
+              <div className="text-white text-sm">
+                {editingMode === 'formation' && "📋 Choose a formation template to start with"}
+                {editingMode === 'players' && "🔄 Drag players to reposition them on the pitch"}
+                {editingMode === 'arrows' && "⚡ Click players or pitch to create movement arrows"}
+                {editingMode === 'zones' && "🎯 Click and drag on pitch to create tactical zones"}
+                {editingMode === 'info' && "📝 Edit team name, manager, and description below"}
+                {arrowStart && editingMode === 'arrows' && " • Click destination for arrow"}
+                {zoneStart && editingMode === 'zones' && " • Click to complete zone"}
+              </div>
+            </div>
+          )}
 
           {/* Enhanced Control Toggles */}
           <div className="flex gap-4 flex-wrap">
@@ -327,6 +602,119 @@ export default function TacticsHub() {
           )}
         </div>
 
+        {/* Formation Selector */}
+        {editMode && editingMode === 'formation' && (
+          <div className="bg-black/30 backdrop-blur-md rounded-2xl p-8 max-w-4xl mx-auto border-2 border-orange-500/30 shadow-2xl mb-8">
+            <h3 className="text-2xl font-black mb-6 text-orange-300">Choose Formation Template</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Object.keys(formations).map((formationName) => (
+                <button
+                  key={formationName}
+                  onClick={() => applyFormation(formationName)}
+                  className="bg-gradient-to-br from-orange-900/40 to-orange-800/40 hover:from-orange-800/60 hover:to-orange-700/60 border-2 border-orange-500/30 hover:border-orange-400/60 rounded-xl p-6 transition-all transform hover:scale-105 shadow-xl"
+                >
+                  <div className="text-2xl font-black text-orange-300 mb-3">{formationName}</div>
+                  <div className="text-sm text-orange-200 mb-4">
+                    {formationName === '4-3-3' && 'Balanced attacking formation with wingers'}
+                    {formationName === '4-4-2' && 'Classic formation with two strikers'}
+                    {formationName === '3-5-2' && 'Wing-back system with central overload'}
+                    {formationName === '4-2-3-1' && 'Defensive stability with creative freedom'}
+                    {formationName === '3-4-3' && 'Attacking wing-back formation'}
+                  </div>
+                  <div className="relative bg-green-600/20 rounded-lg h-32 overflow-hidden">
+                    {/* Mini pitch visualization */}
+                    <div className="absolute inset-0 flex flex-col justify-between p-2">
+                      {/* Show formation layout in miniature */}
+                      {formations[formationName as keyof typeof formations].slice(1).map((player) => (
+                        <div
+                          key={player.id}
+                          className="absolute w-2 h-2 bg-orange-300 rounded-full"
+                          style={{
+                            left: `${10 + ((100 - player.x) / 100) * 80}%`,
+                            top: `${10 + (player.y / 100) * 80}%`,
+                            transform: 'translate(-50%, -50%)'
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="mt-6 flex gap-4 justify-center">
+              <button
+                onClick={() => setEditingMode('players')}
+                className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-xl font-black text-white transition-all shadow-xl"
+              >
+                Go to Player Editor
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Tactic Information Editor */}
+        {editMode && editingMode === 'info' && (
+          <div className="bg-black/30 backdrop-blur-md rounded-2xl p-8 max-w-4xl mx-auto border-2 border-green-500/30 shadow-2xl mb-8">
+            <h3 className="text-2xl font-black mb-6 text-green-300">Edit Tactic Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-lg font-bold mb-2 text-white">Team Name</label>
+                <input
+                  type="text"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  placeholder="Enter team name..."
+                  className="w-full bg-black/50 border-2 border-green-500/50 rounded-xl px-4 py-3 text-white font-bold text-lg backdrop-blur-sm focus:border-green-400 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-lg font-bold mb-2 text-white">Manager Name</label>
+                <input
+                  type="text"
+                  value={customManager}
+                  onChange={(e) => setCustomManager(e.target.value)}
+                  placeholder="Enter manager name..."
+                  className="w-full bg-black/50 border-2 border-green-500/50 rounded-xl px-4 py-3 text-white font-bold text-lg backdrop-blur-sm focus:border-green-400 focus:outline-none"
+                />
+              </div>
+            </div>
+            <div className="mt-6">
+              <label className="block text-lg font-bold mb-2 text-white">Tactical Description</label>
+              <textarea
+                value={customDescription}
+                onChange={(e) => setCustomDescription(e.target.value)}
+                placeholder="Describe your tactical approach, philosophy, and key principles..."
+                rows={4}
+                className="w-full bg-black/50 border-2 border-green-500/50 rounded-xl px-4 py-3 text-white font-bold text-lg backdrop-blur-sm focus:border-green-400 focus:outline-none resize-none"
+              />
+            </div>
+            <div className="mt-6 flex gap-4">
+              <button
+                onClick={() => {
+                  if (customTactic) {
+                    const updatedTactic = {
+                      ...customTactic,
+                      name: customName || "Custom Tactic",
+                      manager: customManager || "You",
+                      description: customDescription || "Your custom tactical setup"
+                    };
+                    setCustomTactic(updatedTactic);
+                  }
+                }}
+                className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-xl font-black text-white transition-all shadow-xl"
+              >
+                Update Information
+              </button>
+              <button
+                onClick={() => setEditingMode('players')}
+                className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-xl font-black text-white transition-all shadow-xl"
+              >
+                Back to Players
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Tactical Description */}
         <div className="text-center mb-8">
           <div className="bg-black/30 backdrop-blur-md rounded-2xl p-8 max-w-6xl mx-auto border-2 border-green-500/30 shadow-2xl">
@@ -342,7 +730,7 @@ export default function TacticsHub() {
                   🎯 CUSTOM EDITOR MODE ACTIVE
                 </p>
                 <p className="text-yellow-200 font-bold mt-2">
-                  Drag players to reposition • Select roles from dropdown • Hover for tactical details • Save when finished
+                  Use the mode buttons above to edit different aspects of your tactic
                 </p>
               </div>
             )}
@@ -360,7 +748,9 @@ export default function TacticsHub() {
           }}
         >
           <div className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-2xl shadow-2xl border-4 border-white/20" 
-               style={{ width: '100%', height: '100%' }}>
+               style={{ width: '100%', height: '100%' }}
+               onClick={handlePitchClick}
+          >
             
             {/* Enhanced Pitch Markings */}
             <svg className="absolute inset-0 w-full h-full">
@@ -411,23 +801,29 @@ export default function TacticsHub() {
             </svg>
 
             {/* Enhanced Tactical Zones */}
-            {showZones && currentPhase && 'zones' in currentPhase && currentPhase.zones && currentPhase.zones.map((zone, idx) => (
+            {showZones && currentPhase && 'zones' in currentPhase && currentPhase.zones && currentPhase.zones.map((zone, idx) => {
+              const marginX = isMobile ? 10 : 30;
+              const marginY = isMobile ? 17.5 : 50;
+              const fieldWidth = (isMobile ? 330 : 540);
+              const fieldHeight = (isMobile ? 490 : 800);
+
+              return (
               <div
                 key={`zone-${idx}`}
                 className="absolute rounded-xl border-4 border-dashed flex items-center justify-center font-black text-lg shadow-lg backdrop-blur-sm"
                 style={{
-                  left: `${30 + (zone.x / 100) * 540}px`,
-                  top: `${50 + (zone.y / 100) * 800}px`,
-                  width: `${(zone.width / 100) * 540}px`,
-                  height: `${(zone.height / 100) * 800}px`,
+                  left: `${marginX + (zone.x / 100) * fieldWidth}px`,
+                  top: `${marginY + (zone.y / 100) * fieldHeight}px`,
+                  width: `${(zone.width / 100) * fieldWidth}px`,
+                  height: `${(zone.height / 100) * fieldHeight}px`,
                   backgroundColor: zone.color,
                   borderColor: zone.color.replace(/0\.\d+/, '0.8'),
                   zIndex: 1
                 }}
               >
-                <span className="bg-black/80 px-4 py-2 rounded-lg text-white border-2 border-white/50">{zone.label}</span>
+                <span className="bg-black/80 px-4 py-2 rounded-lg text-white border-2 border-white/50" style={{fontSize: isMobile ? '12px' : '16px'}}>{zone.label}</span>
               </div>
-            ))}
+            )})}
 
             {/* Enhanced Movement Lines */}
             {showMovementLines && currentPhase && 'movements' in currentPhase && currentPhase.movements && (
@@ -452,13 +848,19 @@ export default function TacticsHub() {
                     </marker>
                   ))}
                 </defs>
-                {currentPhase.movements.map((movement, idx) => (
+                {currentPhase.movements.map((movement, idx) => {
+                  const marginX = isMobile ? 10 : 30;
+                  const marginY = isMobile ? 17.5 : 50;
+                  const fieldWidth = (isMobile ? 330 : 540);
+                  const fieldHeight = (isMobile ? 490 : 800);
+
+                  return (
                   <g key={`movement-${idx}`}>
                     <line
-                      x1={30 + (movement.from.x / 100) * 540}
-                      y1={50 + (movement.from.y / 100) * 800}
-                      x2={30 + (movement.to.x / 100) * 540}
-                      y2={50 + (movement.to.y / 100) * 800}
+                      x1={marginX + (movement.from.x / 100) * fieldWidth}
+                      y1={marginY + (movement.from.y / 100) * fieldHeight}
+                      x2={marginX + (movement.to.x / 100) * fieldWidth}
+                      y2={marginY + (movement.to.y / 100) * fieldHeight}
                       stroke={movement.color || '#FFD700'}
                       strokeWidth="4"
                       strokeDasharray={movement.type === 'pass' ? '15,8' : movement.type === 'press' ? '8,4' : '0'}
@@ -466,8 +868,8 @@ export default function TacticsHub() {
                       className="drop-shadow-lg"
                     />
                     <text
-                      x={30 + ((movement.from.x + movement.to.x) / 2 / 100) * 540}
-                      y={50 + ((movement.from.y + movement.to.y) / 2 / 100) * 800 - 15}
+                      x={marginX + ((movement.from.x + movement.to.x) / 2 / 100) * fieldWidth}
+                      y={marginY + ((movement.from.y + movement.to.y) / 2 / 100) * fieldHeight - 15}
                       fill={movement.color || '#FFD700'}
                       fontSize="14"
                       fontWeight="900"
@@ -479,33 +881,46 @@ export default function TacticsHub() {
                       {movement.player}
                     </text>
                   </g>
-                ))}
+                )})}
               </svg>
             )}
 
             {/* Enhanced Opposition Players */}
-            {showOpposition && oppositionFormations[oppositionFormation].players.map((player, idx) => (
-              <div
-                key={`opp-${idx}`}
-                className="absolute rounded-full border-4 border-white flex items-center justify-center font-black shadow-xl"
-                style={{
-                  width: isMobile ? '32px' : '40px',
-                  height: isMobile ? '32px' : '40px',
-                  left: `${30 + ((100 - player.x) / 100) * 540}px`, // Fixed orientation
-                  top: `${50 + (player.y / 100) * 800}px`,
-                  backgroundColor: oppositionFormations[oppositionFormation].color,
-                  color: 'white',
-                  fontSize: isMobile ? '10px' : '14px',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 5
-                }}
-              >
-                {idx + 1}
-              </div>
-            ))}
+            {showOpposition && oppositionFormations[oppositionFormation].players.map((player, idx) => {
+              const marginX = isMobile ? 10 : 30;
+              const marginY = isMobile ? 17.5 : 50;
+              const fieldWidth = (isMobile ? 330 : 540);
+              const fieldHeight = (isMobile ? 490 : 800);
+
+              return (
+                <div
+                  key={`opp-${idx}`}
+                  className="absolute rounded-full border-4 border-white flex items-center justify-center font-black shadow-xl"
+                  style={{
+                    width: isMobile ? '32px' : '40px',
+                    height: isMobile ? '32px' : '40px',
+                    left: `${marginX + ((100 - player.x) / 100) * fieldWidth}px`,
+                    top: `${marginY + (player.y / 100) * fieldHeight}px`,
+                    backgroundColor: oppositionFormations[oppositionFormation].color,
+                    color: 'white',
+                    fontSize: isMobile ? '10px' : '14px',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 5
+                  }}
+                >
+                  {idx + 1}
+                </div>
+              )
+            })}
 
             {/* Enhanced Team Players */}
-            {currentPhase && 'players' in currentPhase && currentPhase.players.map((player: Player) => (
+            {currentPhase && 'players' in currentPhase && currentPhase.players.map((player: Player) => {
+              const marginX = isMobile ? 10 : 30;
+              const marginY = isMobile ? 17.5 : 50;
+              const fieldWidth = (isMobile ? 330 : 540);
+              const fieldHeight = (isMobile ? 490 : 800);
+
+              return (
               <div key={player.id} className="relative">
                 {/* Player Circle */}
                 <div
@@ -513,8 +928,8 @@ export default function TacticsHub() {
                   style={{
                     width: isMobile ? PLAYER_SIZES.mobile.width + 'px' : PLAYER_SIZES.standard.width + 'px',
                     height: isMobile ? PLAYER_SIZES.mobile.height + 'px' : PLAYER_SIZES.standard.height + 'px',
-                    left: `${30 + ((100 - player.x) / 100) * 540}px`, // Fixed orientation
-                    top: `${50 + (player.y / 100) * 800}px`,
+                    left: `${marginX + ((100 - player.x) / 100) * fieldWidth}px`,
+                    top: `${marginY + (player.y / 100) * fieldHeight}px`,
                     backgroundColor: currentTeam.primaryColor,
                     color: currentTeam.primaryColor === '#FFFFFF' ? '#000000' : '#FFFFFF',
                     fontSize: isMobile ? '12px' : '18px',
@@ -527,8 +942,14 @@ export default function TacticsHub() {
                   }}
                   onMouseEnter={() => setHoveredPlayer(player.id)}
                   onMouseLeave={() => setHoveredPlayer(null)}
-                  draggable={editMode}
-                  onDragEnd={(e) => handlePlayerDragEnd(player.id, e)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (editingMode === 'arrows') {
+                      handlePlayerClick(player.id);
+                    }
+                  }}
+                  draggable={editMode && editingMode === 'players'}
+                  onDragEnd={(e) => editingMode === 'players' && handlePlayerDragEnd(player.id, e)}
                 >
                   {player.id}
                 </div>
@@ -537,8 +958,8 @@ export default function TacticsHub() {
                 <div
                   className="player-name absolute font-black text-white bg-black/90 px-3 py-2 rounded-lg pointer-events-none backdrop-blur-sm border-2"
                   style={{
-                    left: `${30 + ((100 - player.x) / 100) * 540}px`,
-                    top: `${50 + (player.y / 100) * 800 + (isMobile ? 20 : 35)}px`,
+                    left: `${marginX + ((100 - player.x) / 100) * fieldWidth}px`,
+                    top: `${marginY + (player.y / 100) * fieldHeight + (isMobile ? 20 : 35)}px`,
                     transform: 'translate(-50%, 0)',
                     zIndex: 10,
                     borderColor: currentTeam.primaryColor,
@@ -549,12 +970,12 @@ export default function TacticsHub() {
                 </div>
 
                 {/* Enhanced Role Selector for Edit Mode */}
-                {editMode && (
+                {editMode && editingMode === 'players' && (
                   <div
                     className="absolute"
                     style={{
-                      left: `${30 + ((100 - player.x) / 100) * 540}px`,
-                      top: `${50 + (player.y / 100) * 800 - (isMobile ? 25 : 40)}px`,
+                      left: `${marginX + ((100 - player.x) / 100) * fieldWidth}px`,
+                      top: `${marginY + (player.y / 100) * fieldHeight - (isMobile ? 25 : 40)}px`,
                       transform: 'translate(-50%, 0)',
                       zIndex: 20
                     }}
@@ -577,14 +998,24 @@ export default function TacticsHub() {
                   </div>
                 )}
               </div>
-            ))}
+            )})}
 
             {/* Enhanced Player Tooltip */}
             {hoveredPlayer && currentPhase && 'players' in currentPhase && (
               <div className="absolute bg-gradient-to-br from-black via-gray-900 to-black text-white p-6 rounded-2xl shadow-2xl z-30 max-w-sm pointer-events-none border-4 backdrop-blur-md"
                    style={{
-                     left: `${30 + ((100 - (currentPhase.players.find((p: Player) => p.id === hoveredPlayer)?.x || 0)) / 100) * 540 + 40}px`,
-                     top: `${50 + ((currentPhase.players.find((p: Player) => p.id === hoveredPlayer)?.y || 0) / 100) * 800}px`,
+                     left: (() => {
+                       const marginX = isMobile ? 10 : 30;
+                       const fieldWidth = (isMobile ? 330 : 540);
+                       const playerX = currentPhase.players.find((p: Player) => p.id === hoveredPlayer)?.x || 0;
+                       return `${marginX + ((100 - playerX) / 100) * fieldWidth + 40}px`;
+                     })(),
+                     top: (() => {
+                       const marginY = isMobile ? 17.5 : 50;
+                       const fieldHeight = (isMobile ? 490 : 800);
+                       const playerY = currentPhase.players.find((p: Player) => p.id === hoveredPlayer)?.y || 0;
+                       return `${marginY + (playerY / 100) * fieldHeight}px`;
+                     })(),
                      borderColor: currentTeam.primaryColor
                    }}>
                 <div className="text-2xl font-black text-green-300 mb-2">
