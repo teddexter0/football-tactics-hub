@@ -8,6 +8,144 @@
   --foreground: #ffffff;
 }
 
+/* Enhanced Mobile Responsive Design */
+@media (max-width: 768px) {
+  /* Fix button layouts */
+  .phase-buttons {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  
+  .phase-buttons button {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Fix editing mode buttons */
+  .flex.gap-2 {
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+  }
+  
+  .flex.gap-2 button {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    min-width: auto !important;
+  }
+  
+  /* Fix control toggles */
+  .controls-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+  }
+  
+  .controls-row .flex {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .controls-row label {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Fix save/exit buttons */
+  .flex.gap-4 button {
+    padding: 0.75rem 1.5rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Better spacing for mobile */
+  .mb-8 {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Fix text overflow */
+  .max-w-md {
+    max-width: 90vw !important;
+  }
+  
+  /* Footer specific fixes */
+  .inline-flex {
+    width: 90vw !important;
+    max-width: 350px !important;
+    margin: 0 auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Even smaller screens */
+  .text-6xl {
+    font-size: 1.75rem !important;
+    line-height: 1.2 !important;
+  }
+  
+  .text-3xl {
+    font-size: 1.25rem !important;
+  }
+  
+  /* Compact button layout */
+  .phase-buttons {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.25rem !important;
+  }
+  
+  .phase-buttons button {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+  
+  /* Very compact editing buttons */
+  .flex.gap-2 button {
+    padding: 0.375rem 0.5rem !important;
+    font-size: 0.625rem !important;
+  }
+  
+  /* Make everything fit */
+  .px-6 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
+/* Enhanced Mobile Responsive Design */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+  
+  .tactical-pitch {
+    width: 95vw !important;
+    height: calc(95vw * 1.5) !important;
+    max-width: 350px !important;
+    max-height: 525px !important;
+    margin: 0 auto !important;
+  }
+  
+  .max-w-7xl {
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Fix horizontal scroll */
+  .min-h-screen {
+    overflow-x: hidden !important;
+  }
+  
+  /* Better grid layout */
+  .grid {
+    gap: 1rem !important;
+  }
+  
+  .grid.lg\\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .grid.lg\\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
 body {
   background: var(--background);
   color: var(--foreground);
@@ -15,13 +153,7 @@ body {
 }
 
 /* Mobile Responsive Design */
-@media (max-width: 768px) {
-  .tactical-pitch {
-    width: 95vw !important;
-    height: calc(95vw * 1.4) !important;
-    max-width: 350px !important;
-    max-height: 490px !important;
-  }
+@media (max-width: 768px) { 
   
   .team-controls {
     flex-direction: column;

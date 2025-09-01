@@ -1,8 +1,9 @@
- # ⚽ Football Tactics Hub
+# ⚽ Football Tactics Hub
 
-> **The Ultimate Football Tactical Analysis Platform**
-> Are you a football fanatic, then this is the place to brainstorm tactical insights! Learn from the pinnacle prosperers from the past and patch your own tactics!
-> Analyze legendary football teams and their tactical masterpieces through interactive visualizations, detailed player roles, and comprehensive phase-by-phase breakdowns.
+> **The Ultimate Football Tactical Analysis Platform**  
+> Create, analyze, and master football tactics with legendary teams and custom formations!
+
+<div align="center">
 
 ![Football Tactics Hub](https://img.shields.io/badge/Football-Tactics%20Hub-green?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJtOCAxNCA2LTYiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Im0xNCA4LTYgNiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+)
 
@@ -12,44 +13,80 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.3-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+</div>
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-FF99CC?style=for-the-badge)](https://football-tactics-hub.vercel.app/)
-[![Screenshot 1](https://img.shields.io/badge/Screenshot%201-FF99CC?style=for-the-badge)](/assets/screenshot(1).png)
-[![Screenshot 2](https://img.shields.io/badge/Screenshot%202-FF99CC?style=for-the-badge)](/assets/screenshot(2).png)
-[![Screenshot 3](https://img.shields.io/badge/Screenshot%201-FF99CC?style=for-the-badge)](/assets/screenshot(3).png)
-[![Screenshot 4](https://img.shields.io/badge/Screenshot%202-FF99CC?style=for-the-badge)](/assets/screenshot(4).png)
+## 🎬 Screenshots & Demo
 
-## 🌟 Features
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="/assets/screenshot(1).png" width="300px" alt="Main Interface" style="border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+        <br><b>🏆 Main Interface</b>
+      </td>
+      <td align="center">
+        <img src="/assets/screenshot(2).png" width="300px" alt="Tactical Analysis" style="border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+        <br><b>⚽ Tactical Analysis</b>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="/assets/screenshot(3).png" width="300px" alt="Custom Tactics Editor" style="border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+        <br><b>🎯 Custom Tactics Editor</b>
+      </td>
+      <td align="center">
+        <img src="/assets/screenshot(4).png" width="300px" alt="Mobile Experience" style="border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+        <br><b>📱 Mobile Responsive</b>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div align="center">
+
+### 🚀 [**Live Demo**](https://football-tactics-hub.vercel.app/) 
+
+</div>
+
+---
+
+## 🌟 Revolutionary Features
 
 ### 🎯 **Interactive Tactical Analysis**
-- **Dynamic Football Pitch**: Fully interactive pitch with realistic proportions and professional markings
-- **Player Positioning**: Drag-and-drop player positioning with real-time updates
-- **Movement Visualization**: Animated arrows showing player movements, passes, and tactical runs
-- **Zone Analysis**: Tactical zones highlighting pressing areas, overloads, and defensive blocks
+- **Responsive Football Pitch**: Fully interactive pitch with realistic proportions and professional markings that scales perfectly on all devices
+- **Dynamic Player Positioning**: Drag-and-drop player positioning with real-time updates and mobile-optimized touch controls
+- **Advanced Movement Visualization**: Custom-named arrows showing player movements, passes, and tactical runs with delete functionality
+- **Intelligent Zone Analysis**: Create, label, and delete tactical zones for pressing areas, overloads, and defensive blocks
 
 ### ⚽ **Legendary Teams Database**
-- **18 Iconic Teams**: From Sacchi's pressing revolution to Conte's 3-4-3 Premier League dominance
+- **20+ Iconic Teams**: From Sacchi's pressing revolution to Guardiola's positional play mastery
 - **Historical Accuracy**: Meticulously researched formations, player roles, and tactical innovations
 - **Manager Insights**: Authentic quotes and tactical philosophies from legendary coaches
-- **Era Spanning**: Teams from 1980s Italian masters to modern positional play titans
+- **Era Spanning**: Teams from 1980s Italian masters to modern tactical innovators
 
-### 🎮 **Game Phase Analysis**
-- **Kickoff Phase**: Basic formation and player positioning
-- **In Possession**: Attacking movements, overloads, and creative patterns  
-- **Out of Possession**: Pressing triggers, defensive shapes, and recovery runs
-- **Set Pieces**: Corner kicks, free kicks, and dead ball specialists
+### 🎮 **Revolutionary Custom Tactics Editor**
+- **5 Professional Formations**: Choose from 4-3-3, 4-4-2, 3-5-2, 4-2-3-1, and 3-4-3 templates
+- **Formation-First Approach**: Teams now attack UP the pitch for proper tactical visualization
+- **Advanced Player Editor**: Drag & drop positioning with 25+ tactical roles
+- **Named Movement System**: Create custom arrows with personalized movement names
+- **Tactical Zone Creator**: Click & drag to create labeled tactical zones
+- **Delete Mode**: Easy deletion of arrows and zones with visual feedback
+- **Complete Info Editor**: Customize team name, manager, and tactical description
 
-### 🛠️ **Custom Tactics Editor**
-- **Create Your Own**: Build custom formations with drag-and-drop positioning
-- **Player Roles**: Choose from 25+ tactical roles (False 9, Regista, Box-to-Box, etc.)
-- **Role Descriptions**: Detailed explanations of each tactical role
-- **Save & Export**: Save your custom tactics for future analysis
+### 🛠️ **5-Mode Editing System**
+1. **📋 Formation Mode**: Select professional formation templates with visual previews
+2. **🧑‍🤝‍🧑 Players Mode**: Drag players and assign tactical roles  
+3. **⚡ Arrows Mode**: Create named movement arrows between players and pitch positions
+4. **🎯 Zones Mode**: Draw and label tactical zones for advanced analysis
+5. **⚙️ Info Mode**: Edit team details, manager info, and tactical descriptions
 
-### 📱 **Modern Experience**
-- **Fully Responsive**: Perfect on desktop, tablet, and mobile devices
-- **Smooth Animations**: Fluid player movements and tactical transitions
-- **Professional Design**: Modern UI with football-inspired color schemes
-- **Performance Optimized**: Built with Next.js 14 for lightning-fast performance
+### 📱 **Perfect Mobile Experience**
+- **Fully Responsive Design**: Optimized for phones, tablets, and desktops
+- **Touch-Optimized Controls**: Mobile-friendly drag & drop and touch interactions
+- **Scaled Pitch Elements**: All players, arrows, and zones scale perfectly on mobile
+- **Adaptive Layout**: Smart responsive grid that works on all screen sizes
+
+---
 
 ## 🚀 Quick Start
 
@@ -92,72 +129,94 @@ npm start
 npx vercel --prod
 ```
 
+---
+
+## 🎯 How to Use
+
+### **Analyzing Legendary Teams**
+1. **Select Team**: Navigate through 20+ legendary teams with navigation buttons
+2. **Choose Phase**: Select from Kickoff, In Possession, Out of Possession, or Set Pieces
+3. **Toggle Controls**: Show/hide opposition, movement lines, and tactical zones
+4. **Player Analysis**: Hover over players for detailed role descriptions and tactical insights
+
+### **Creating Custom Tactics** ⭐
+1. **Start Creation**: Click "Create Custom Tactics" to enter the advanced editor
+2. **Choose Formation** (Orange Mode): Pick from 5 professional formations with visual previews
+3. **Position Players** (Purple Mode): Drag and drop players to perfect positions
+4. **Add Movement Arrows** (Yellow Mode): 
+   - Click start point → click end point
+   - Name your movements (e.g., "Messi Cut Inside", "Overlapping Run")
+   - Toggle delete mode to remove unwanted arrows
+5. **Create Tactical Zones** (Blue Mode):
+   - Click and drag to draw zones
+   - Label zones (e.g., "Pressing Zone", "Overload Area")
+   - Delete mode for easy removal
+6. **Edit Team Info** (Green Mode): Customize team name, manager, and tactical philosophy
+7. **Save Your Masterpiece**: Save tactics for future analysis and sharing
+
+### **Advanced Features**
+- **Opposition Analysis**: Choose from multiple opposition formations (4-4-2, 5-4-1, 3-5-2)
+- **Delete Mode**: Toggle delete mode in arrows/zones to remove elements with visual feedback
+- **Named Movements**: Every arrow can have a custom name for detailed tactical analysis
+- **Mobile Optimization**: Full functionality on mobile devices with touch controls
+
+---
+
 ## 🏗️ Tech Stack
 
 ### **Frontend Framework**
-- **Next.js 14**: React framework with App Router, Server Components, and optimizations
+- **Next.js 14**: React framework with App Router and Server Components
 - **React 18**: Latest React with concurrent features and improved performance
 - **TypeScript**: Full type safety and enhanced developer experience
 
 ### **Styling & UI**
-- **Tailwind CSS**: Utility-first CSS framework for rapid UI development
-- **Custom CSS**: Hand-crafted animations and responsive design
-- **Lucide React**: Beautiful, customizable icons
+- **Tailwind CSS**: Utility-first CSS framework with responsive design
+- **Custom CSS**: Hand-crafted animations and mobile-responsive design
+- **Lucide React**: Beautiful, customizable icons and UI elements
 
 ### **Data & State Management**
-- **TypeScript Interfaces**: Strongly typed team and player data structures
-- **Local Storage**: Custom tactics persistence with error handling
-- **React Hooks**: State management with useState, useCallback, and useEffect
+- **TypeScript Interfaces**: Strongly typed team, player, and tactical data structures
+- **React Hooks**: Advanced state management with useState, useCallback, and useEffect
+- **Custom Hooks**: Specialized tactical data management and persistence
 
-### **Development Tools**
-- **ESLint**: Code linting with Next.js recommended rules
-- **PostCSS**: CSS processing with Tailwind CSS integration
-- **UI Avatars API**: Dynamic manager portrait generation
+### **Mobile & Responsive**
+- **Responsive Design**: Mobile-first approach with adaptive layouts
+- **Touch Optimization**: Touch-friendly controls and gesture support
+- **Scalable Elements**: SVG-based pitch with perfect scaling on all devices
+
+---
 
 ## 📊 Legendary Teams Included
 
-| Team | Era | Manager | Achievement |
-|------|-----|---------|-------------|
-| 🔵 **Manchester City** | 2022/23 | Pep Guardiola | Treble Winners |
-| 🔴 **AC Milan** | 1987-1991 | Arrigo Sacchi | Pressing Revolution |
-| 🔵 **Chelsea** | 2016/17 | Antonio Conte | 3-4-3 Revolution |
-| 🔵 **Chelsea** | 2020/21 | Thomas Tuchel | Champions League Winners |
-| 🔵 **Leicester City** | 2015/16 | Claudio Ranieri | Greatest Underdog Story |
-| 🔴 **Barcelona** | 2014/15 | Luis Enrique | MSN Treble |
-| 🔵 **PSG** | 2024/25 | Luis Enrique | Historic Treble |
-| 🔵 **France** | 2018 | Didier Deschamps | World Cup Winners |
-| 🔴 **Manchester United** | 2007/08 | Sir Alex Ferguson | Champions League Winners |
-| 🔵 **Chelsea** | 2004/05 | José Mourinho | Special One Arrives |
-| ⚪ **Real Madrid** | 2011/12 | José Mourinho | Counter-Attack Masters |
-| 🔴 **AC Milan** | 2006/07 | Carlo Ancelotti | Champions League Winners |
-| 🔴 **Liverpool** | 2018-20 | Jürgen Klopp | Heavy Metal Football |
-| ⚫ **Inter Milan** | 2009/10 | José Mourinho | Historic Treble |
-| ⚫ **Germany** | 2014 | Joachim Löw | Systematic Excellence |
-| 🔴 **Barcelona** | 2008-2012 | Pep Guardiola | Greatest Team Ever |
-| ⚪ **Real Madrid** | 2016-2018 | Zinedine Zidane | Three CLs in a Row |
-| 🔴 **Spain** | 2008-2012 | Vicente del Bosque | Tiki-Taka Domination |
+<details>
+<summary><b>🔥 View All 20+ Legendary Teams</b></summary>
 
-*...featuring the most iconic tactical innovations and legendary managers in football history*
+| Team | Era | Manager | Achievement | Formation |
+|------|-----|---------|-------------|-----------|
+| 🔵 **Manchester City** | 2022/23 | Pep Guardiola | Treble Winners | 4-3-3 / 3-2-4-1 |
+| 🔴 **Barcelona** | 2008-2012 | Pep Guardiola | Greatest Team Ever | 4-6-0 / 4-3-3 |
+| 🔴 **AC Milan** | 1987-1991 | Arrigo Sacchi | Pressing Revolution | 4-4-2 |
+| 🔵 **Chelsea** | 2016/17 | Antonio Conte | 3-4-3 Revolution | 3-4-3 |
+| 🔵 **Leicester City** | 2015/16 | Claudio Ranieri | Greatest Underdog Story | 4-4-2 |
+| 🔴 **Liverpool** | 2018-20 | Jürgen Klopp | Heavy Metal Football | 4-3-3 |
+| 🔴 **Barcelona** | 2014/15 | Luis Enrique | MSN Treble | 4-3-3 |
+| 🔵 **PSG** | 2024/25 | Luis Enrique | Historic Treble | 4-3-3 |
+| 🔵 **France** | 2018 | Didier Deschamps | World Cup Winners | 4-2-3-1 |
+| 🔴 **Manchester United** | 2007/08 | Sir Alex Ferguson | Champions League Winners | 4-4-2 |
+| ⚫ **Inter Milan** | 2009/10 | José Mourinho | Historic Treble | 4-2-3-1 |
+| ⚫ **Germany** | 2014 | Joachim Löw | Systematic Excellence | 4-2-3-1 |
+| ⚪ **Real Madrid** | 2016-2018 | Zinedine Zidane | Three CLs in a Row | 4-3-3 |
+| 🔴 **Spain** | 2008-2012 | Vicente del Bosque | Tiki-Taka Domination | 4-6-0 |
+| 🔴 **AC Milan** | 2006/07 | Carlo Ancelotti | Champions League Winners | 4-3-2-1 |
+| 🔵 **Chelsea** | 2004/05 | José Mourinho | Special One Arrives | 4-3-3 |
+| ⚪ **Real Madrid** | 2011/12 | José Mourinho | Counter-Attack Masters | 4-2-3-1 |
+| 🔵 **Chelsea** | 2020/21 | Thomas Tuchel | Champions League Winners | 3-4-2-1 |
+| ⚪ **Arsenal** | 2003/04 | Arsène Wenger | The Invincibles | 4-4-2 |
+| 🔴 **Barcelona** | 1991/92 | Johan Cruyff | The Dream Team | 3-4-3 |
 
-## 🎯 Usage Guide
+</details>
 
-### **Analyzing Teams**
-1. **Select Team**: Navigate through legendary teams with arrow buttons
-2. **Choose Phase**: Select from Kickoff, In Possession, Out of Possession, or Set Pieces
-3. **Toggle Controls**: Show/hide opposition, movement lines, and tactical zones
-4. **Player Details**: Hover over players for detailed role descriptions
-
-### **Custom Tactics**
-1. **Create Custom**: Click "Create Custom Tactics" to enter editor mode
-2. **Position Players**: Drag players to desired positions on the pitch
-3. **Assign Roles**: Select tactical roles from position-specific dropdowns
-4. **Save Tactics**: Save your formation for future reference
-
-### **Advanced Features**
-- **Opposition Analysis**: Choose different opposition formations (4-4-2, 5-4-1, 3-5-2)
-- **Movement Visualization**: See passing lanes, pressing triggers, and positional rotations
-- **Tactical Zones**: Understand space occupation and territorial control
-- **Set Piece Analysis**: Detailed corner kick and free kick setups
+---
 
 ## 🤝 Contributing
 
@@ -166,81 +225,56 @@ We welcome contributions from football tacticians, developers, and enthusiasts!
 ### **How to Contribute**
 1. **Fork** the repository
 2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
-3. **Commit** your changes: `git commit -m 'Add amazing feature'`
+3. **Commit** your changes: `git commit -m 'Add amazing custom tactics feature'`
 4. **Push** to branch: `git push origin feature/amazing-feature`
 5. **Open** a Pull Request
 
 ### **Contribution Ideas**
-- 🏆 **Add New Teams**: Research and add more legendary teams
-- 🎨 **UI Improvements**: Enhanced animations, better responsive design
-- ⚽ **Tactical Features**: Advanced analytics, heat maps, player tracking
-- 🌍 **Internationalization**: Support for multiple languages
-- 📊 **Data Visualization**: Charts, statistics, and tactical trends
+- 🏆 **Add New Teams**: Research and add more legendary teams and formations
+- 🎨 **UI Improvements**: Enhanced animations, better responsive design, dark mode
+- ⚽ **Advanced Features**: Heat maps, player tracking, advanced analytics
+- 📱 **Mobile Enhancements**: Native app features, offline mode, gesture improvements
+- 🌍 **Internationalization**: Support for multiple languages and regions
 
-### **Code Style Guidelines**
-- Use TypeScript for all new code
-- Follow existing code patterns and naming conventions
-- Add comments for complex tactical logic
-- Ensure responsive design on all screen sizes
-- Test on mobile devices
-
-## 📁 Project Structure
-
-```
-football-tactics-hub/
-├── 📄 README.md                 # You are here
-├── 📄 package.json             # Dependencies and scripts
-├── 📄 next.config.js           # Next.js configuration
-├── 📄 tailwind.config.js       # Tailwind CSS configuration
-├── 📄 tsconfig.json           # TypeScript configuration
-├── 📁 src/
-│   ├── 📁 app/
-│   │   ├── 📄 layout.tsx       # Root layout with fonts
-│   │   ├── 📄 page.tsx         # Main page component
-│   │   └── 📄 globals.css      # Global styles and responsive design
-│   ├── 📁 components/
-│   │   └── 📄 TacticsHub.tsx   # Main application component
-│   ├── 📁 data/
-│   │   ├── 📄 teams.ts         # Legendary teams database
-│   │   ├── 📄 formations.ts    # Opposition formations
-│   │   └── 📄 playerRoles.ts   # Player roles and descriptions
-│   ├── 📁 types/
-│   │   └── 📄 tactics.ts       # TypeScript interfaces
-│   ├── 📁 hooks/
-│   │   └── 📄 useLocalStorage.ts # Custom tactics persistence
-│   └── 📁 utils/
-│       ├── 📄 constants.ts     # App constants and dimensions
-│       └── 📄 tacticStorage.ts # Local storage utilities
-└── 📁 public/
-    └── (Static assets, if any)
-```
+---
 
 ## 🐛 Known Issues & Roadmap
 
-### **Current Limitations**
-- 🔧 Set piece editor not fully implemented
-- 📱 Some mobile gestures need refinement
-- 🎨 Manager portraits use placeholder API
+### **Recent Fixes** ✅
+- ✅ **Mobile Responsiveness**: Fixed pitch scaling and element positioning on mobile devices  
+- ✅ **Formation Direction**: Teams now properly attack up the pitch for realistic tactical view
+- ✅ **Delete Functionality**: Added delete mode for removing arrows and tactical zones
+- ✅ **Named Movements**: Movement arrows now have custom names instead of generic labels
+- ✅ **Responsive Layout**: Bottom sections and statistics properly scale on mobile devices
 
-### **Upcoming Features**
-- 🏆 **More Teams**: Adding classic teams across all football eras
-- 📈 **Analytics Dashboard**: Team comparison, statistical analysis
-- 🎮 **Interactive Training**: Tactical drills and scenarios
-- 🌐 **Online Sharing**: Share custom tactics with the community
-- 📊 **Match Analysis**: Upload and analyze real match footage
-- 🔄 **3D Visualization**: Three-dimensional tactical analysis
+### **Current Limitations**
+- 🔧 Set piece editor not fully implemented for all corner scenarios
+- 📊 Advanced analytics dashboard in development
+- 🎨 Manager portraits use placeholder API (functional but could be enhanced)
+
+### **Upcoming Features** 🚀
+- 🏆 **More Legendary Teams**: Adding classic teams from all football eras
+- 📈 **Advanced Analytics**: Team comparison, statistical analysis, performance metrics  
+- 🎮 **Interactive Training**: Tactical drills, scenario-based learning modules
+- 🌐 **Community Features**: Share tactics, community voting, tactical challenges
+- 📊 **Match Analysis Tools**: Upload and analyze real match footage with AI
+- 🔄 **3D Visualization**: Three-dimensional tactical analysis and pitch views
+
+---
 
 ## 📞 Support & Community
 
 ### **Get Help**
-- 📧 **Email**: support@footballtacticshub.com
 - 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/football-tactics-hub/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/football-tactics-hub/discussions)
+- 📧 **Email**: support@footballtacticshub.com
 
 ### **Connect with Us**
 - 🐦 **Twitter**: [@FootballTacticsHub](https://twitter.com/footballtacticshub)
 - 📘 **Facebook**: [Football Tactics Hub](https://facebook.com/footballtacticshub)
 - 📸 **Instagram**: [@footballtacticshub](https://instagram.com/footballtacticshub)
+
+---
 
 ## 📄 License
 
@@ -248,40 +282,54 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ### **MIT License Summary**
 - ✅ **Commercial Use**: Use in commercial projects
-- ✅ **Modification**: Modify and distribute
-- ✅ **Distribution**: Distribute freely
-- ✅ **Private Use**: Use privately
-- ❌ **Liability**: No warranty or liability
+- ✅ **Modification**: Modify and distribute freely
+- ✅ **Distribution**: Distribute without restrictions
+- ✅ **Private Use**: Use privately without limitations
+- ❌ **Liability**: No warranty or liability provided
 - ❌ **Patent Rights**: No patent rights granted
+
+---
 
 ## 🙏 Acknowledgments
 
-### **Tactical Inspiration**
+### **Tactical Legends**
 - **Arrigo Sacchi** - For revolutionizing football with pressing and zonal marking
-- **Pep Guardiola** - For positional play and tactical innovation
-- **Rinus Michels** - For creating Total Football philosophy
-- **All Legendary Managers** - Who shaped the beautiful game
+- **Pep Guardiola** - For positional play and tactical innovation mastery
+- **Johan Cruyff** - For creating Total Football philosophy and the Dream Team
+- **José Mourinho** - For tactical flexibility and big-game mentality
+- **All Legendary Managers** - Who shaped the beautiful game we analyze today
 
-### **Technical Credits**
-- **Next.js Team** - Amazing React framework
-- **Tailwind Labs** - Utility-first CSS framework
-- **Vercel** - Deployment platform
-- **Lucide** - Beautiful icons
-- **UI Avatars** - Manager portrait API
+### **Technical Excellence**
+- **Next.js Team** - For the incredible React framework and development experience
+- **Tailwind Labs** - For the utility-first CSS framework that powers our responsive design
+- **Vercel** - For seamless deployment and hosting platform
+- **Lucide** - For beautiful, scalable icons and UI components
+- **TypeScript Team** - For type safety and enhanced development experience
 
-### **Data Sources**
-- Historical match analysis and tactical breakdowns
-- Manager interviews and tactical philosophies
-- Football analytics and statistical research
+### **Community & Data**
+- **Football Analytics Community** - For tactical insights and historical match analysis
+- **Tactical Enthusiasts** - Who provided feedback and feature suggestions
+- **Open Source Contributors** - Making football tactics accessible to everyone
 
 ---
 
 <div align="center">
 
-**Made with ⚽ and ❤️ for football tacticians worldwide**
+### **Made with ⚽ and ❤️ for football tacticians worldwide**
 
 *"Football is cyclical. Today's innovation becomes tomorrow's foundation."*
 
 ⭐ **Star this repository if you love football tactics!** ⭐
+
+[![GitHub Stars](https://img.shields.io/github/stars/yourusername/football-tactics-hub?style=social)](https://github.com/yourusername/football-tactics-hub/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/yourusername/football-tactics-hub?style=social)](https://github.com/yourusername/football-tactics-hub/network/members)
+
+**🎯 Ready to create your tactical masterpiece?**
+
+[**🚀 Try Football Tactics Hub Now**](https://football-tactics-hub.vercel.app/)
+
+---
+
+*Built by tacticians, for tacticians. Analyze the past, create the future.*
 
 </div>
