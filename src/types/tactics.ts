@@ -6,6 +6,13 @@ export interface Player {
   y: number;
   role: string;
   detail: string;
+  overallRating?: number;
+  // Extra attributes for set-piece and micro-skill filters
+ headingRating?: number; // Aerial ability (0-99)
+  tightSpacesRating?: number; // Press resistance/tech in tight areas (0-99)
+ pounceAbilityInBox?: number; // Instinct/poacher behavior around rebounds/second balls (0-99)
+ age?: number;
+ pouncerRating?: number; // Goal poaching ability (0-99)
 }
 
 export interface Movement {
@@ -23,6 +30,7 @@ export interface TacticalZone {
   height: number;
   color: string;
   label: string;
+  zIndex?: number;
 }
 
 export interface CornerSetup {

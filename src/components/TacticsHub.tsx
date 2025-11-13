@@ -1247,7 +1247,11 @@ const handlePlayerDragEnd = useCallback((playerId: number, e: React.DragEvent) =
               Star Players
             </h3>
             <div className="space-y-4">
-              {currentPhase && 'players' in currentPhase && currentPhase.players.slice(0, 6).map((player: Player) => (
+              {currentPhase && 'players' in currentPhase && currentPhase.players
+                .slice()
+                .sort((a, b) => (b.overallRating ?? 0) - (a.overallRating ?? 0))
+                .slice(0, 5)
+                .map((player: Player) => (
                 <div key={player.id} 
                      className="flex items-center gap-4 p-4 bg-black/40 rounded-xl border-2 hover:bg-black/60 transition-all backdrop-blur-sm shadow-lg"
                      style={{ borderColor: currentTeam.primaryColor + '40' }}>
