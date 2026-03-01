@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { fetchManagerPhoto } from '@/utils/managerImages';
 import { ChevronLeft, ChevronRight, Edit3, Save, RotateCcw, Target, Zap, Users, Settings } from 'lucide-react';
 import { legendaryTeams } from '@/data/teams';
 import { oppositionFormations } from '@/data/formations';
@@ -29,6 +30,9 @@ export default function TacticsHub() {
   const [customDescription, setCustomDescription] = useState('');
   const [customName, setCustomName] = useState('');
   const [customManager, setCustomManager] = useState('');
+  const [managerPhoto, setManagerPhoto] = useState<string>('');
+  const [draggingPlayer, setDraggingPlayer] = useState<number | null>(null);
+  const pitchRef = useRef<HTMLDivElement>(null);
 
   // Custom tactics hook
   const { customTactic, setCustomTactic, updatePlayerPosition, updatePlayerRole, saveCurrentTactic } = useTactics();
@@ -40,6 +44,17 @@ export default function TacticsHub() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Fetch real manager photo from Wikipedia (free, no auth)
+  useEffect(() => {
+    const managerName = editMode && customTactic ? customTactic.manager : legendaryTeams[selectedTeam].manager;
+    const controller = new AbortController();
+    setManagerPhoto('');
+    fetchManagerPhoto(managerName, controller.signal).then(url => {
+      if (url) setManagerPhoto(url);
+    });
+    return () => controller.abort();
+  }, [selectedTeam, editMode, customTactic?.manager]);
 
   const formations = {
   '4-3-3': [
@@ -316,28 +331,30 @@ export default function TacticsHub() {
     }
   }, [editingMode, editMode, customTactic, gamePhase, arrowStart, addMovementArrow]);
 
-  // Player position update - Fixed coordinates
-const handlePlayerDragEnd = useCallback((playerId: number, e: React.DragEvent) => {
-  if (editMode && customTactic && gamePhase !== 3 && editingMode === 'players') {
-    const rect = e.currentTarget.parentElement?.getBoundingClientRect();
-    if (rect) {
-      const marginX = isMobile ? 10 : 30;
-      const marginY = isMobile ? 17.5 : 50;
-      const fieldWidth = rect.width - (marginX * 2);
-      const fieldHeight = rect.height - (marginY * 2);
-      
-      const newX = ((e.clientX - rect.left - marginX) / fieldWidth) * 100;
-      const newY = ((e.clientY - rect.top - marginY) / fieldHeight) * 100;
-      const boundedX = Math.max(0, Math.min(100, 100 - newX)); // Flip X coordinate
-      const boundedY = Math.max(0, Math.min(100, newY));
-      
-      console.log('Drag position:', { newX, newY, boundedX, boundedY }); // Debug log
-      
-      const updatedTactic = updatePlayerPosition(customTactic, gamePhase, playerId, boundedX, boundedY);
-      setCustomTactic(updatedTactic);
+  // Player drag — pointer-based for smooth, live tracking (no HTML5 ghost image)
+  const handlePlayerPointerDown = useCallback((playerId: number, e: React.PointerEvent<HTMLDivElement>) => {
+    if (editMode && customTactic && gamePhase !== 3 && editingMode === 'players') {
+      e.preventDefault();
+      e.stopPropagation();
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      setDraggingPlayer(playerId);
     }
-  }
-}, [editMode, customTactic, gamePhase, updatePlayerPosition, setCustomTactic, isMobile, editingMode]);
+  }, [editMode, customTactic, gamePhase, editingMode]);
+
+  const handlePlayerPointerMove = useCallback((playerId: number, e: React.PointerEvent<HTMLDivElement>) => {
+    if (draggingPlayer !== playerId || !editMode || !customTactic || gamePhase === 3) return;
+    const rect = pitchRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const marginX = isMobile ? 10 : 30;
+    const marginY = isMobile ? 17.5 : 50;
+    const fieldWidth = rect.width - marginX * 2;
+    const fieldHeight = rect.height - marginY * 2;
+    const rawX = ((e.clientX - rect.left - marginX) / fieldWidth) * 100;
+    const rawY = ((e.clientY - rect.top - marginY) / fieldHeight) * 100;
+    const boundedX = Math.max(0, Math.min(100, 100 - rawX));
+    const boundedY = Math.max(0, Math.min(100, rawY));
+    setCustomTactic(updatePlayerPosition(customTactic, gamePhase, playerId, boundedX, boundedY));
+  }, [draggingPlayer, editMode, customTactic, gamePhase, isMobile, updatePlayerPosition, setCustomTactic]);
 
   // Role update
   const handleRoleChange = useCallback((playerId: number, newRole: string, position: string) => {
@@ -416,12 +433,12 @@ const handlePlayerDragEnd = useCallback((playerId: number, e: React.DragEvent) =
               disabled={editMode || selectedTeam === 0}
             />
             <div className="flex-1 text-center max-w-2xl">
-              {/* Manager Image */}
+              {/* Manager Image — real photo via Wikipedia API, fallback to initials */}
               <div className="flex justify-center mb-4">
-                <img 
-                  src={currentTeam.managerImage} 
+                <img
+                  src={managerPhoto || currentTeam.managerImage}
                   alt={currentTeam.manager}
-                  className="w-24 h-24 rounded-full border-4 shadow-xl"
+                  className="w-24 h-24 rounded-full border-4 shadow-xl object-cover object-top"
                   style={{ borderColor: currentTeam.primaryColor }}
                 />
               </div>
@@ -799,9 +816,11 @@ const handlePlayerDragEnd = useCallback((playerId: number, e: React.DragEvent) =
             maxHeight: isMobile ? '525px' : 'none'
           }}
         >
-          <div className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-2xl shadow-2xl border-4 border-white/20" 
+          <div ref={pitchRef} className="relative bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-2xl shadow-2xl border-4 border-white/20"
                style={{ width: '100%', height: '100%' }}
                onClick={handlePitchClick}
+               onPointerUp={() => setDraggingPlayer(null)}
+               onPointerLeave={() => setDraggingPlayer(null)}
           >
             {/* Enhanced Pitch Markings */}
 <svg className="absolute inset-0 w-full h-full">
@@ -1050,7 +1069,7 @@ const handlePlayerDragEnd = useCallback((playerId: number, e: React.DragEvent) =
               <div key={player.id} className="relative">
                 {/* Player Circle */}
                 <div
-                  className={`player-circle absolute rounded-full border-4 border-white flex items-center justify-center font-black cursor-pointer transition-all duration-300 shadow-xl ${editMode ? 'hover:scale-125' : 'hover:scale-115'} backdrop-blur-sm`}
+                  className={`player-circle absolute rounded-full border-4 border-white flex items-center justify-center font-black shadow-xl ${editMode ? 'hover:scale-125' : 'hover:scale-115'} ${draggingPlayer === player.id ? '' : 'transition-all duration-150'} backdrop-blur-sm`}
                   style={{
                     width: isMobile ? PLAYER_SIZES.mobile.width + 'px' : PLAYER_SIZES.standard.width + 'px',
                     height: isMobile ? PLAYER_SIZES.mobile.height + 'px' : PLAYER_SIZES.standard.height + 'px',
@@ -1060,11 +1079,17 @@ const handlePlayerDragEnd = useCallback((playerId: number, e: React.DragEvent) =
                     color: currentTeam.primaryColor === '#FFFFFF' ? '#000000' : '#FFFFFF',
                     fontSize: isMobile ? '12px' : '18px',
                     transform: 'translate(-50%, -50%)',
-                    zIndex: hoveredPlayer === player.id ? 25 : 15,
-                    boxShadow: hoveredPlayer === player.id ? 
-                      `0 0 30px ${currentTeam.primaryColor}, 0 0 60px ${currentTeam.primaryColor}40` : 
-                      '0 8px 16px rgba(0,0,0,0.4)',
-                    border: editMode ? `4px solid ${currentTeam.secondaryColor}` : `4px solid white`
+                    zIndex: draggingPlayer === player.id ? 30 : hoveredPlayer === player.id ? 25 : 15,
+                    boxShadow: draggingPlayer === player.id
+                      ? `0 0 40px ${currentTeam.primaryColor}, 0 12px 24px rgba(0,0,0,0.6)`
+                      : hoveredPlayer === player.id
+                        ? `0 0 30px ${currentTeam.primaryColor}, 0 0 60px ${currentTeam.primaryColor}40`
+                        : '0 8px 16px rgba(0,0,0,0.4)',
+                    border: editMode ? `4px solid ${currentTeam.secondaryColor}` : `4px solid white`,
+                    cursor: editMode && editingMode === 'players'
+                      ? draggingPlayer === player.id ? 'grabbing' : 'grab'
+                      : 'pointer',
+                    touchAction: 'none',
                   }}
                   onMouseEnter={() => setHoveredPlayer(player.id)}
                   onMouseLeave={() => setHoveredPlayer(null)}
@@ -1074,8 +1099,10 @@ const handlePlayerDragEnd = useCallback((playerId: number, e: React.DragEvent) =
                       handlePlayerClick(player.id);
                     }
                   }}
-                  draggable={editMode && editingMode === 'players'}
-                  onDragEnd={(e) => editingMode === 'players' && handlePlayerDragEnd(player.id, e)}
+                  onPointerDown={(e) => handlePlayerPointerDown(player.id, e)}
+                  onPointerMove={(e) => handlePlayerPointerMove(player.id, e)}
+                  onPointerUp={() => setDraggingPlayer(null)}
+                  onPointerCancel={() => setDraggingPlayer(null)}
                 >
                   {player.id}
                 </div>
@@ -1109,6 +1136,7 @@ const handlePlayerDragEnd = useCallback((playerId: number, e: React.DragEvent) =
                     <select
                       value={player.role}
                       onChange={(e) => handleRoleChange(player.id, e.target.value, player.position)}
+                      onPointerDown={(e) => e.stopPropagation()}
                       className="bg-black/95 text-white text-xs font-bold rounded-lg px-3 py-2 border-2 backdrop-blur-sm shadow-xl"
                       style={{
                         borderColor: currentTeam.primaryColor,
