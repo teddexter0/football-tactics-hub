@@ -55,7 +55,8 @@ export interface Team {
   primaryColor: string;
   secondaryColor: string;
   quote: string;
-  managerImage: string; // ← This was missing!
+  managerImage?: string; // URL to manager's photo (e.g., from Wikipedia or a sports API)
+  teamBadge?: string; // URL to team's badge/logo for that specific year
   phases: {
     0: GamePhase; // Kickoff
     1: GamePhase; // In Possession

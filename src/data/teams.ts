@@ -1,4 +1,4 @@
-import { Team } from '../types/tactics';
+import { CornerSetup, Player, Team } from '../types/tactics';
 
 // Using UI Avatars API for free manager portraits (no signup required)
 const getManagerImage = (name: string, teamColor: string) => {
@@ -6,7 +6,55 @@ const getManagerImage = (name: string, teamColor: string) => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=200&background=${cleanColor}&color=fff&font-size=0.4`;
 };
 
-export const legendaryTeams: Team[] = [
+const targetPositions = [
+  { x: 58, y: 86 },
+  { x: 43, y: 88 },
+  { x: 51, y: 94 },
+  { x: 66, y: 91 },
+];
+
+const deliveryPosition = { x: 98, y: 98 };
+
+const isCornerTaker = (player: Player, index: number, players: Player[]) => {
+  const role = player.role.toLowerCase();
+  return (
+    index === players.length - 1 ||
+    role.includes('corner') ||
+    role.includes('crosser') ||
+    role.includes('delivery') ||
+    role.includes('precision') ||
+    role.includes('set piece') ||
+    role.includes('dead ball')
+  );
+};
+
+const normalizeCornerSetup = (corner: CornerSetup): CornerSetup => ({
+  ...corner,
+  players: corner.players.map((player, index, players) => ({
+    ...player,
+    ...(isCornerTaker(player, index, players)
+      ? deliveryPosition
+      : targetPositions[index % targetPositions.length]),
+  })),
+  opposition: [
+    { x: 50, y: 90, role: 'GK' },
+    { x: 47, y: 86, role: 'Near-post defender' },
+    { x: 55, y: 90, role: 'Central marker' },
+    { x: 38, y: 92, role: 'Back-post marker' },
+  ],
+});
+
+const normalizeTeamCorners = (team: Team): Team => ({
+  ...team,
+  phases: {
+    ...team.phases,
+    3: {
+      corners: team.phases[3].corners.map(normalizeCornerSetup),
+    },
+  },
+});
+
+const rawLegendaryTeams: Team[] = [
   
 
 // Barcelona 2008-2012
@@ -1594,94 +1642,6 @@ export const legendaryTeams: Team[] = [
       }
     }
   },
-  // 07 Milan- Carlo
-  {
-    name: "AC Milan 2006/07",
-    manager: "Carlo Ancelotti",
-    achievement: "Champions League Winners - Italian Revenge",
-    formation: "4-3-2-1 Christmas Tree",
-    style: "Tactical Flexibility, Experience, Clinical Finishing",
-    description: "Ancelotti's tactical masterpiece of experience and intelligence. The perfect Christmas Tree formation combining defensive solidity with creative freedom, delivering revenge against Liverpool in Athens.",
-    primaryColor: "#FB090B",
-    secondaryColor: "#000000",
-    quote: "Football is made of dreams, and we made our dreams come true in Athens.",
-    managerImage: getManagerImage("Carlo Ancelotti", "#FB090B"),
-    phases: {
-      0: {
-        players: [
-          { id: 1, name: "Dida", position: "GK", x: 50, y: 95, role: "Brazilian Wall", detail: "Samba goalkeeper with incredible reflexes", overallRating: 86, age: 33, pounceAbilityInBox: 55 },
-          { id: 44, name: "Oddo", position: "RB", x: 15, y: 75, role: "Attacking RB", detail: "Italian fullback providing width", overallRating: 80, age: 31, pounceAbilityInBox: 65 },
-          { id: 13, name: "Nesta", position: "CB", x: 40, y: 80, role: "Elegant Leader", detail: "Italian legend reading game perfectly", overallRating: 89, age: 31, pounceAbilityInBox: 75 },
-          { id: 3, name: "Maldini", position: "CB", x: 60, y: 80, role: "Captain Legend", detail: "Milan icon playing center-back at 38", overallRating: 86, age: 38, pounceAbilityInBox: 70 },
-          { id: 18, name: "Jankulovski", position: "LB", x: 85, y: 75, role: "Balanced LB", detail: "Macedonian providing defensive stability", overallRating: 79, age: 30, pounceAbilityInBox: 65 },
-          { id: 23, name: "Ambrosini", position: "CDM", x: 45, y: 65, role: "Destroyer", detail: "Italian warrior winning midfield battles", overallRating: 82, age: 30, pounceAbilityInBox: 75 },
-          { id: 8, name: "Gattuso", position: "CDM", x: 55, y: 65, role: "Pitbull", detail: "Calabrian fighter never giving up", overallRating: 86, age: 29, pounceAbilityInBox: 75 },
-          { id: 21, name: "Pirlo", position: "CM", x: 50, y: 55, role: "Regista Maestro", detail: "Italian genius with impossible passes", overallRating: 88, age: 28, pounceAbilityInBox: 80 },
-          { id: 22, name: "Kaká", position: "CAM", x: 45, y: 40, role: "Ballon d'Or Winner", detail: "Brazilian magician at his absolute peak", overallRating: 91, age: 25, pounceAbilityInBox: 90 },
-          { id: 10, name: "Seedorf", position: "CAM", x: 55, y: 40, role: "Dutch Master", detail: "Surinamese-Dutch with incredible technique", overallRating: 86, age: 31, pounceAbilityInBox: 85 },
-          { id: 7, name: "Inzaghi", position: "ST", x: 50, y: 25, role: "Super Pippo", detail: "Italian fox who lived offside", overallRating: 82, age: 34, pounceAbilityInBox: 95 }
-        ]
-      },
-      1: {
-        players: [
-          { id: 1, name: "Dida", position: "GK", x: 50, y: 88, role: "Distribution Master", detail: "Brazilian precision starting attacks", overallRating: 86, age: 33, pounceAbilityInBox: 55 },
-          { id: 44, name: "Oddo", position: "RB", x: 12, y: 65, role: "Overlapping RB", detail: "Italian providing width and crosses", overallRating: 80, age: 31, pounceAbilityInBox: 65 },
-          { id: 13, name: "Nesta", position: "CB", x: 40, y: 78, role: "Ball-Playing CB", detail: "Italian class bringing ball forward", overallRating: 89, age: 31, pounceAbilityInBox: 75 },
-          { id: 3, name: "Maldini", position: "CB", x: 60, y: 78, role: "Veteran Leader", detail: "Milan legend organizing from defense", overallRating: 86, age: 38, pounceAbilityInBox: 70 },
-          { id: 18, name: "Jankulovski", position: "LB", x: 88, y: 65, role: "Supporting LB", detail: "Provides balance when needed", overallRating: 79, age: 30, pounceAbilityInBox: 65 },
-          { id: 23, name: "Ambrosini", position: "CDM", x: 45, y: 70, role: "Dynamic Mid", detail: "Italian covering ground efficiently", overallRating: 82, age: 30, pounceAbilityInBox: 75 },
-          { id: 8, name: "Gattuso", position: "CDM", x: 55, y: 70, role: "Ball Winner", detail: "Wins everything, launches attacks", overallRating: 86, age: 29, pounceAbilityInBox: 75 },
-          { id: 21, name: "Pirlo", position: "CM", x: 50, y: 60, role: "Deep Playmaker", detail: "Italian conductor orchestrating attacks", overallRating: 88, age: 28, pounceAbilityInBox: 80 },
-          { id: 22, name: "Kaká", position: "CAM", x: 40, y: 30, role: "Creative Genius", detail: "Brazilian magic creating everything", overallRating: 91, age: 25, pounceAbilityInBox: 90 },
-          { id: 10, name: "Seedorf", position: "CAM", x: 60, y: 30, role: "Dutch Elegance", detail: "Technique and vision combined", overallRating: 86, age: 31, pounceAbilityInBox: 85 },
-          { id: 7, name: "Inzaghi", position: "ST", x: 50, y: 20, role: "Poacher Supreme", detail: "Italian fox finding space everywhere", overallRating: 82, age: 34, pounceAbilityInBox: 95 }
-        ],
-        movements: [
-          { from: { x: 15, y: 75 }, to: { x: 12, y: 65 }, type: 'movement', player: 'Oddo Overlaps', color: '#FB090B' },
-          { from: { x: 45, y: 40 }, to: { x: 40, y: 30 }, type: 'movement', player: 'Kaká Magic', color: '#000000' },
-          { from: { x: 50, y: 55 }, to: { x: 50, y: 60 }, type: 'movement', player: 'Pirlo Orchestrates', color: '#FB090B' }
-        ],
-        zones: [
-          { x: 30, y: 20, width: 40, height: 25, color: 'rgba(251, 9, 11, 0.3)', label: 'Christmas Tree Attack Zone' },
-          { x: 35, y: 45, width: 30, height: 25, color: 'rgba(0, 0, 0, 0.3)', label: 'Creative Hub - Pirlo Zone' }
-        ]
-      },
-      2: {
-        players: [
-          { id: 1, name: "Dida", position: "GK", x: 50, y: 88, role: "Commanding GK", detail: "Brazilian authority in goal", overallRating: 86, age: 33, pounceAbilityInBox: 55 },
-          { id: 44, name: "Oddo", position: "RB", x: 20, y: 70, role: "Disciplined RB", detail: "Italian defensive discipline", overallRating: 80, age: 31, pounceAbilityInBox: 65 },
-          { id: 13, name: "Nesta", position: "CB", x: 40, y: 75, role: "Defensive Maestro", detail: "Italian legend reading everything", overallRating: 89, age: 31, pounceAbilityInBox: 75 },
-          { id: 3, name: "Maldini", position: "CB", x: 60, y: 75, role: "Captain Leader", detail: "Milan icon leading by example at 38", overallRating: 86, age: 38, pounceAbilityInBox: 70 },
-          { id: 18, name: "Jankulovski", position: "LB", x: 80, y: 70, role: "Solid LB", detail: "Macedonian defensive reliability", overallRating: 79, age: 30, pounceAbilityInBox: 65 },
-          { id: 23, name: "Ambrosini", position: "CDM", x: 45, y: 65, role: "Defensive Mid", detail: "Italian warrior protecting defense", overallRating: 82, age: 30, pounceAbilityInBox: 75 },
-          { id: 8, name: "Gattuso", position: "CDM", x: 55, y: 65, role: "Midfield Destroyer", detail: "Calabrian pitbull winning everything", overallRating: 86, age: 29, pounceAbilityInBox: 75 },
-          { id: 21, name: "Pirlo", position: "CM", x: 50, y: 60, role: "Deep Anchor", detail: "Italian genius even defended with class", overallRating: 88, age: 28, pounceAbilityInBox: 80 },
-          { id: 22, name: "Kaká", position: "CAM", x: 45, y: 50, role: "Defensive CAM", detail: "Brazilian star tracking back", overallRating: 91, age: 25, pounceAbilityInBox: 90 },
-          { id: 10, name: "Seedorf", position: "CAM", x: 55, y: 50, role: "Work Rate CAM", detail: "Dutch experience working for team", overallRating: 86, age: 31, pounceAbilityInBox: 85 },
-          { id: 7, name: "Inzaghi", position: "ST", x: 50, y: 35, role: "Counter Threat", detail: "Italian fox ready for counter", overallRating: 82, age: 34, pounceAbilityInBox: 95 }
-        ],
-        zones: [
-          { x: 0, y: 50, width: 100, height: 35, color: 'rgba(0, 0, 0, 0.2)', label: 'Italian Defensive Discipline - Champions League Winners' }
-        ]
-      },
-      3: {
-        corners: [
-          {
-            name: "Maldini Leadership Header",
-            players: [
-              { id: 3, name: "Maldini", position: "CB", x: 85, y: 82, role: "Captain Legend", detail: "Milan icon dangerous at set pieces even at 38", overallRating: 86, age: 38, pounceAbilityInBox: 70 },
-              { id: 13, name: "Nesta", position: "CB", x: 78, y: 78, role: "Elegant Threat", detail: "Italian class with perfect timing", overallRating: 89, age: 31, pounceAbilityInBox: 75 },
-              { id: 7, name: "Inzaghi", position: "ST", x: 82, y: 75, role: "Box Predator", detail: "Italian fox finding space in chaos", overallRating: 82, age: 34, pounceAbilityInBox: 95 },
-              { id: 21, name: "Pirlo", position: "CM", x: 95, y: 85, role: "Set Piece Master", detail: "Italian genius with impossible precision", overallRating: 88, age: 28, pounceAbilityInBox: 80 }
-            ],
-            opposition: [
-              { x: 50, y: 90, role: "GK" }, { x: 85, y: 85, role: "Defender" }
-            ]
-          }
-        ]
-      }
-    }
-  },
   // AC Milan 1987-1991 - Sacchi
   {
     name: "AC Milan 1987-1991",
@@ -1944,4 +1904,6 @@ export const legendaryTeams: Team[] = [
       }
     }
   }
-]; 
+];
+
+export const legendaryTeams: Team[] = rawLegendaryTeams.map(normalizeTeamCorners);
