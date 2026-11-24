@@ -19,6 +19,9 @@ const portraits: Record<string, [file: string, directory: string]> = {
   'Johan Cruyff': ['Johan_Cruijff_cropped.jpg', '2/28'],
   'David Beckham': ['Beckswimbledon.jpg', '9/9e'],
   'Carles Puyol': ['Carles_Puyol_Joan_Gamper-Tr.jpg', '6/60'],
+  'Radja Nainggolan': ['Radja_Nainggolan01.jpg', 'd/df'],
+  'Paul Pogba': ['Paul_Pogba_2017.jpg', 'a/af'],
+  'Marek Hamšík': ['Marek_Hamšík.jpg', '6/69'],
 };
 
 export function featuredPortrait(title: string) {
@@ -40,7 +43,7 @@ const outfield = ['PAC', 'SHO', 'PAS', 'DRI', 'DEF', 'PHY'];
 const goalkeeper = ['DIV', 'HAN', 'KIC', 'REF', 'SPD', 'POS'];
 
 function card(
-  year: 22 | 23,
+  year: 17 | 20 | 22 | 23,
   name: string,
   position: Position,
   overall: number,
@@ -223,4 +226,68 @@ export const featuredPlayers: PlayerProfile[] = [
     'Spanish defender',
     card(22, 'Icon Moments', 'CB', 94, [79, 49, 69, 60, 96, 92])
   ),
+  {
+    ...profile(
+      'Radja Nainggolan',
+      'Belgian central midfielder',
+      card(
+        20,
+        'Team of the Season Moments',
+        'CAM',
+        93,
+        [85, 89, 90, 93, 93, 93],
+        'https://www.fut.gg/players/178518-radja-nainggolan/'
+      ),
+      card(
+        20,
+        'Headliners',
+        'CAM',
+        88,
+        [80, 87, 86, 88, 88, 87],
+        'https://www.fut.gg/players/178518-radja-nainggolan/'
+      )
+    ),
+    position: 'CM',
+    aliases: ['Radja Naingolan', 'Il Ninja'],
+  },
+  {
+    ...profile(
+      'Paul Pogba',
+      'French central midfielder',
+      card(
+        23,
+        'Flashback',
+        'CM',
+        90,
+        [81, 86, 89, 90, 80, 91],
+        'https://www.futwiz.com/fifa23/player/paul-pogba/19471'
+      )
+    ),
+    position: 'CM',
+    aliases: ['Paul Labile Pogba'],
+  },
+  {
+    ...profile(
+      'Marek Hamšík',
+      'Slovak central midfielder',
+      card(
+        17,
+        'Team of the Season',
+        'CM',
+        94,
+        [84, 95, 96, 97, 85, 92],
+        'https://www.fut.gg/players/171877-marek-hamsik/'
+      ),
+      card(
+        17,
+        'Team of the Week',
+        'CM',
+        89,
+        [80, 90, 91, 92, 80, 86],
+        'https://www.fut.gg/players/171877-marek-hamsik/'
+      )
+    ),
+    position: 'CM',
+    aliases: ['Marekiaro'],
+  },
 ];

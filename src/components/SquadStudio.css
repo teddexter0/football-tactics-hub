@@ -47,11 +47,25 @@
   filter: drop-shadow(0 0 8px #9081ff);
   flex: none;
 }
-.studio-mast a {
-  font-size: 0.8rem;
-  color: #cccbef;
-  font-weight: 700;
-  text-align: right;
+.studio-legends {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.52rem 0.85rem;
+  border-radius: 0.62rem;
+  border: 1px solid #ffe5a5;
+  color: #241334;
+  background: linear-gradient(125deg, #ffdc88, #d4b1ff);
+  box-shadow: 0 0 18px #dca6ff55;
+  font-size: 0.86rem;
+  font-weight: 850;
+  transition:
+    box-shadow 0.22s,
+    filter 0.22s;
+}
+.studio-legends:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 0 25px #e6beff99;
 }
 .studio-heading {
   padding: 1.35rem 0 1.2rem;
@@ -180,6 +194,65 @@
 .studio-board-bar select {
   max-width: 135px;
 }
+.studio .studio-lane-toggle[aria-pressed='true'] {
+  color: #ffed9e;
+  border-color: #e8bc51;
+  background: #473b22;
+  box-shadow: 0 0 14px #ffcf5a55;
+}
+.studio-shape-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: start;
+  gap: 0.45rem;
+  padding: 0 0.65rem 0.65rem;
+}
+.studio-shape-bar output {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border-left: 2px solid var(--accent);
+  border-radius: 0 0.3rem 0.3rem 0;
+  background: rgb(var(--glow) / 0.15);
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.studio-shape-bar output strong {
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.studio .studio-reset-shape {
+  min-height: 29px;
+  margin-right: auto;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.72rem;
+}
+.studio-kit-menu {
+  max-width: 100%;
+}
+.studio-kit-menu summary {
+  width: fit-content;
+  margin-left: auto;
+  padding: 0.25rem 0.58rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: #171b37;
+  font-size: 0.79rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.studio-kit-menu[open] {
+  flex-basis: 100%;
+}
+.studio-kit-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.45rem;
+}
 .studio-pitch-wrap {
   padding: 0 0.65rem;
 }
@@ -216,18 +289,58 @@
   inset: 0;
   color: #a3baff86;
   pointer-events: none;
+  overflow: hidden;
+}
+.studio-lanes {
+  fill: #ffdb5d;
+  stroke: #ffe07c;
+  stroke-width: 0.29;
+  stroke-opacity: 0.83;
+  filter: drop-shadow(0 0 6px #ffcb4caf);
+}
+.studio-marking-overlay {
+  fill: #ff94c7;
+  stroke: #ff9bd0;
+  stroke-width: 0.45;
+  filter: drop-shadow(0 0 3px #ff6dbd);
+}
+.studio-marking-overlay .studio-zonal {
+  fill: #8bf4dc;
+  stroke: #8bf4dc;
+}
+.studio [data-pattern] {
+  --kit-angle: 90deg;
+}
+.studio [data-pattern='Hoops'] {
+  --kit-angle: 0deg;
+}
+.studio [data-pattern='Stripes'],
+.studio [data-pattern='Hoops'] {
+  --kit-pattern: repeating-linear-gradient(
+    var(--kit-angle),
+    var(--kit-color) 0 6px,
+    var(--kit-accent) 6px 12px
+  );
 }
 .studio-opponent {
   display: grid;
   place-items: center;
   position: absolute;
+  z-index: 2;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   width: 22px;
   height: 22px;
   color: #fff;
-  background: #993b6d;
-  border: 1px solid #ff99c9;
+  background: var(--kit-pattern, var(--kit-color));
+  border: 1px solid var(--kit-color);
+  box-shadow:
+    0 0 0 1px #16152a,
+    0 0 8px var(--kit-color);
+  text-shadow:
+    0 1px 2px #080a19,
+    0 0 3px #080a19,
+    0 0 3px #080a19;
   font-size: 0.62rem;
   font-weight: 750;
   pointer-events: none;
@@ -278,6 +391,15 @@
     top 0.32s cubic-bezier(0.23, 1, 0.32, 1),
     box-shadow 0.22s,
     opacity 0.15s;
+}
+.studio .studio-pitch-card[data-pattern] {
+  border-color: var(--kit-color);
+  background:
+    linear-gradient(0deg, #11152a 8%, #151a32df 62%, #171a3424 100%),
+    var(
+      --kit-pattern,
+      linear-gradient(155deg, var(--kit-color), var(--kit-accent))
+    );
 }
 .studio .studio-card:is(:hover, :focus-visible) {
   border-color: var(--accent);
@@ -648,6 +770,9 @@
   }
   .studio-board-bar label select {
     max-width: 110px;
+  }
+  .studio-kit-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (prefers-reduced-motion: reduce) {

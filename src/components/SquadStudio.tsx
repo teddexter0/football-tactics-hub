@@ -5,18 +5,21 @@ import {
   useRef,
   useState,
   type PointerEvent,
+  type CSSProperties,
   type ReactNode,
 } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeftRight,
   Check,
+  Columns,
   Crosshair,
   Expand,
   Move,
   Plus,
   Search,
   Settings2,
+  Trophy,
   Undo2,
   X,
 } from 'lucide-react';
@@ -27,8 +30,15 @@ import PlayerMarket from '@/components/PlayerMarket';
 import {
   bench,
   createSquad,
+  defaultKits,
+  detectShape,
   formations,
   instructionFields,
+  keeperColors,
+  kitColors,
+  kitPatterns,
+  markingZones,
+  outfieldColors,
   phaseNames,
   phases,
   positionRoles,
@@ -42,6 +52,7 @@ import {
   type Squad,
   type SquadCard,
 } from '@/data/squad';
+import PitchLines from '@/components/StudioPitchLines';
 import './SquadStudio.css';
 
 const storageKey = 'football-tactics-hub.squads.v1';
@@ -60,16 +71,26 @@ const tools: { value: Tool; label: string }[] = [
   { value: 'move', label: 'Position' },
   { value: 'swap', label: 'Swap' },
   { value: 'run', label: 'Run' },
+  { value: 'curve', label: 'Bent arrow' },
   { value: 'pass', label: 'Pass' },
   { value: 'press', label: 'Press' },
   { value: 'zone', label: 'Zone' },
+  { value: 'circle', label: 'Circle' },
 ];
-const markColors = {
-  run: '#a6dfff',
-  pass: '#f4df90',
-  press: '#ffa0cb',
-  zone: '#ad91ff',
-};
+
+const kitFields = [
+  ['home', 'Your outfield', outfieldColors],
+  ['homePattern', 'Your pattern', kitPatterns],
+  ['homeKeeper', 'Your goalkeeper', keeperColors],
+  ['away', 'Opposition outfield', outfieldColors],
+  ['awayPattern', 'Opposition pattern', kitPatterns],
+  ['awayKeeper', 'Opposition goalkeeper', keeperColors],
+] as const;
+
+function kitStyle(color: keyof typeof kitColors): CSSProperties {
+  const [primary, accent] = kitColors[color];
+  return { '--kit-color': primary, '--kit-accent': accent } as CSSProperties;
+}
 
 function slotName(slot: number) {
   if (slot < 11) return 'Starter ' + (slot + 1);
@@ -118,87 +139,15 @@ function Popup({
   );
 }
 
-function PitchLines({
-  marks,
-  first,
-}: {
-  marks: BoardMark[];
-  first: Point | null;
-}) {
-  return (
-    <svg
-      className="studio-pitch-lines"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        {(['run', 'pass', 'press'] as const).map((type) => (
-          <marker
-            key={type}
-            id={'studio-' + type}
-            markerWidth="6"
-            markerHeight="6"
-            refX="5"
-            refY="3"
-            orient="auto"
-          >
-            <path fill={markColors[type]} d="M0,0 L6,3 L0,6 Z" />
-          </marker>
-        ))}
-      </defs>
-      <g fill="none" stroke="currentColor" strokeWidth=".26">
-        <rect x="3" y="3" width="94" height="94" rx=".35" />
-        <path d="M3 50h94 M22 3v15h56V3 M22 97V82h56v15 M37 3v6h26V3 M37 97v-6h26v6 M44 3V1h12v2 M44 97v2h12v-2" />
-        <ellipse cx="50" cy="50" rx="15" ry="9" />
-      </g>
-      <g fill="currentColor">
-        <circle cx="50" cy="50" r=".45" />
-        <circle cx="50" cy="13" r=".38" />
-        <circle cx="50" cy="87" r=".38" />
-      </g>
-      {marks.map(({ start, end, type }, i) =>
-        type === 'zone' ? (
-          <rect
-            key={i}
-            x={Math.min(start.x, end.x)}
-            y={Math.min(start.y, end.y)}
-            width={Math.abs(start.x - end.x)}
-            height={Math.abs(start.y - end.y)}
-            fill={markColors[type]}
-            fillOpacity=".2"
-            stroke={markColors[type]}
-            strokeWidth=".25"
-            strokeDasharray="1 .6"
-          />
-        ) : (
-          <line
-            key={i}
-            x1={start.x}
-            y1={start.y}
-            x2={end.x}
-            y2={end.y}
-            strokeWidth=".42"
-            markerEnd={'url(#studio-' + type + ')'}
-            stroke={markColors[type]}
-            strokeDasharray={type === 'run' ? undefined : '1.2 .6'}
-          />
-        )
-      )}
-      {first && <circle cx={first.x} cy={first.y} r="1" fill="#eee8ff" />}
-    </svg>
-  );
-}
-
 export default function SquadStudio() {
   const [saved, setSaved] = useState<SavedSquads>(initial);
   const [ready, setReady] = useState(false);
   const [storageIssue, setStorageIssue] = useState(false);
   const [phase, setPhase] = useState<Phase>('kickoff');
   const [tool, setTool] = useState<Tool>('move');
-  const [opposition, setOpposition] = useState(-1);
   const [zoom, setZoom] = useState(false);
   const [first, setFirst] = useState<Point | null>(null);
+  const [bend, setBend] = useState<Point | null>(null);
   const [swapSlot, setSwapSlot] = useState<number | null>(null);
   const [placing, setPlacing] = useState<number | null>(null);
   const [dialog, setDialog] = useState<Dialog | null>(null);
@@ -221,6 +170,61 @@ export default function SquadStudio() {
   const squad =
     saved.squads.find((item) => item.id === saved.active) ?? saved.squads[0];
   const setup = squad.setups[phase];
+  const opposition = squad.opposition ?? -1;
+  const opponents = oppositionFormations[opposition]?.players ?? [];
+  const kits = { ...defaultKits, ...squad.kits };
+  const dragPoint =
+    tool === 'move' &&
+    dragging &&
+    dragging.slot < 11 &&
+    (dragging.target === undefined || dragging.target < 11)
+      ? pitchPoint(dragging.point.x, dragging.point.y)
+      : null;
+  const liveSpots =
+    dragPoint && dragging
+      ? setup.spots.map((spot, i) =>
+          i === dragging.slot ? { ...spot, ...clampPoint(dragPoint) } : spot
+        )
+      : setup.spots;
+  const detectedShape = detectShape(liveSpots);
+  const customShape = shape(setup.formation).some(
+    (spot, i) =>
+      spot.x !== setup.spots[i]?.x ||
+      spot.y !== setup.spots[i]?.y ||
+      spot.position !== setup.spots[i]?.position
+  );
+  const assignments =
+    phase === 'defend'
+      ? liveSpots.flatMap<{ start: Point; end: Point; zone?: number }>(
+          (spot, slot) => {
+            const instruction =
+              setup.instructions[squad.cards[slot]?.id ?? 'slot:' + slot];
+            const mode = instruction?.choices.Marking;
+            if (spot.position === 'GK') return [];
+            const zone = instruction?.markZone;
+            if (mode === 'Zonal' && zone !== undefined && markingZones[zone]) {
+              const { x, y, width, height } = markingZones[zone];
+              return [
+                {
+                  start: spot,
+                  end: { x: x + width / 2, y: y + height / 2 },
+                  zone,
+                },
+              ];
+            }
+            const target = instruction?.mark && opponents[instruction.mark - 1];
+            if (
+              target &&
+              mode !== 'Zonal' &&
+              mode !== 'Track runners' &&
+              (instruction.markFormation === undefined ||
+                instruction.markFormation === opposition)
+            )
+              return [{ start: spot, end: target }];
+            return [];
+          }
+        )
+      : [];
   const filled = (slots: number[]) =>
     slots.filter((slot) => squad.cards[slot]).length;
 
@@ -388,6 +392,7 @@ export default function SquadStudio() {
 
   function resetInteraction() {
     setFirst(null);
+    setBend(null);
     setSwapSlot(null);
     setPlacing(null);
     setMessage('');
@@ -437,11 +442,15 @@ export default function SquadStudio() {
     };
   }
 
-  function placeCard(slot: number, point: Point) {
-    updateSpot(slot, {
+  function clampPoint(point: Point) {
+    return {
       x: Math.max(10, Math.min(90, point.x)),
       y: Math.max(8, Math.min(92, point.y)),
-    });
+    };
+  }
+
+  function placeCard(slot: number, point: Point) {
+    updateSpot(slot, clampPoint(point));
     setMessage('Position updated for ' + phaseNames[phase] + '.');
   }
 
@@ -453,14 +462,19 @@ export default function SquadStudio() {
     }
     if (tool === 'move' || tool === 'swap') return;
     if (!first) setFirst(point);
+    else if (tool === 'curve' && !bend) setBend(point);
     else {
       if (Math.hypot(point.x - first.x, point.y - first.y) > 1) {
         updatePhase((current) => ({
           ...current,
-          marks: [...current.marks, { start: first, end: point, type: tool }],
+          marks: [
+            ...current.marks,
+            { start: first, end: point, type: tool, bend: bend ?? undefined },
+          ],
         }));
       }
       setFirst(null);
+      setBend(null);
     }
   }
 
@@ -514,7 +528,12 @@ export default function SquadStudio() {
     if (!moved) return;
     suppressClick.current = true;
     const target = dropTarget(event.clientX, event.clientY);
-    if (target !== undefined && target !== slot) swap(slot, target);
+    if (
+      target !== undefined &&
+      target !== slot &&
+      (tool === 'swap' || slot >= 11 || target >= 11)
+    )
+      swap(slot, target);
     else if (tool === 'move' && slot < 11) {
       const point = pitchPoint(event.clientX, event.clientY);
       if (point) placeCard(slot, point);
@@ -537,12 +556,25 @@ export default function SquadStudio() {
         data-highlight={
           swapSlot === slot ||
           placing === slot ||
-          (dragging?.target === slot && dragging.slot !== slot)
+          (dragging?.target === slot &&
+            dragging.slot !== slot &&
+            (tool === 'swap' || dragging.slot >= 11 || slot >= 11))
         }
         data-instructions={Boolean(
           setup.instructions[card?.id ?? 'slot:' + slot]
         )}
-        style={spot ? { left: spot.x + '%', top: spot.y + '%' } : undefined}
+        data-pattern={
+          spot ? (slot === 0 ? 'Solid' : kits.homePattern) : undefined
+        }
+        style={
+          spot
+            ? {
+                left: spot.x + '%',
+                top: spot.y + '%',
+                ...kitStyle(slot === 0 ? kits.homeKeeper : kits.home),
+              }
+            : undefined
+        }
         aria-label={
           slotName(slot) +
           (spot ? ' ' + spot.position : '') +
@@ -591,6 +623,9 @@ export default function SquadStudio() {
     selectedSlot !== undefined
       ? setup.instructions[selectedCard?.id ?? 'slot:' + selectedSlot]
       : undefined;
+  const markingMode =
+    selectedInstruction?.choices.Marking ||
+    (selectedInstruction?.mark ? 'Man mark' : '');
 
   return (
     <main ref={studio} className="studio" data-phase={phase}>
@@ -600,8 +635,8 @@ export default function SquadStudio() {
             <Crosshair size={23} />
             <span>Football Tactics Hub</span>
           </div>
-          <Link href="/legends">
-            Legendary teams <span aria-hidden="true">↗</span>
+          <Link href="/legends" className="studio-legends">
+            <Trophy size={19} /> Legends <span aria-hidden="true">↗</span>
           </Link>
         </header>
         <div className="studio-heading">
@@ -663,7 +698,7 @@ export default function SquadStudio() {
             </div>
             <div className="studio-board-bar">
               <label>
-                Formation{' '}
+                Preset{' '}
                 <select
                   aria-label="Phase formation"
                   value={setup.formation}
@@ -688,9 +723,10 @@ export default function SquadStudio() {
                 <select
                   aria-label="Opposition formation"
                   value={opposition}
-                  onChange={(event) =>
-                    setOpposition(Number(event.target.value))
-                  }
+                  onChange={(event) => {
+                    const opposition = Number(event.target.value);
+                    updateSquad((current) => ({ ...current, opposition }));
+                  }}
                 >
                   <option value={-1}>Off</option>
                   {oppositionFormations.map((formation, i) => (
@@ -702,12 +738,71 @@ export default function SquadStudio() {
               </label>
               <button
                 type="button"
+                className="studio-lane-toggle"
+                title="Highlight the wings, half-spaces and centre"
+                aria-pressed={Boolean(squad.showLanes)}
+                onClick={() =>
+                  updateSquad((current) => ({
+                    ...current,
+                    showLanes: !current.showLanes,
+                  }))
+                }
+              >
+                <Columns size={15} /> Pep lanes
+              </button>
+              <button
+                type="button"
                 className="studio-zoom"
                 aria-pressed={zoom}
                 onClick={() => setZoom(!zoom)}
               >
                 <Expand size={15} /> {zoom ? 'Fit pitch' : 'Enlarge pitch'}
               </button>
+            </div>
+            <div className="studio-shape-bar">
+              <output aria-live={dragging ? 'off' : 'polite'}>
+                <span>Detected shape</span>
+                <strong>{detectedShape}</strong>
+              </output>
+              {customShape && (
+                <button
+                  type="button"
+                  className="studio-reset-shape"
+                  onClick={() => {
+                    updatePhase((current) => ({
+                      ...current,
+                      spots: shape(current.formation),
+                    }));
+                    resetInteraction();
+                  }}
+                >
+                  <Undo2 size={14} /> Reset preset
+                </button>
+              )}
+              <details className="studio-kit-menu">
+                <summary>Kits</summary>
+                <div className="studio-kit-options">
+                  {kitFields.map(([key, label, options]) => (
+                    <label className="studio-field" key={key}>
+                      <span>{label}</span>
+                      <select
+                        value={kits[key]}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          updateSquad((current) => ({
+                            ...current,
+                            kits: { ...current.kits, [key]: value },
+                          }));
+                        }}
+                      >
+                        {options.map((option) => (
+                          <option key={option}>{option}</option>
+                        ))}
+                      </select>
+                    </label>
+                  ))}
+                </div>
+              </details>
             </div>
             <div className="studio-pitch-wrap" data-zoom={zoom}>
               <div
@@ -718,19 +813,30 @@ export default function SquadStudio() {
                   if (point) clickPitch(point);
                 }}
               >
-                <PitchLines marks={setup.marks} first={first} />
-                {oppositionFormations[opposition]?.players.map(
-                  ({ x, y }, index) => (
-                    <span
-                      key={index}
-                      className="studio-opponent"
-                      style={{ left: x + '%', top: y + '%' }}
-                      title={'Opponent ' + (index + 1)}
-                    >
-                      {index + 1}
-                    </span>
-                  )
-                )}
+                <PitchLines
+                  marks={setup.marks}
+                  first={first}
+                  bend={bend}
+                  showLanes={Boolean(squad.showLanes)}
+                  assignments={assignments}
+                />
+                {opponents.map(({ x, y }, index) => (
+                  <span
+                    key={index}
+                    className="studio-opponent"
+                    data-pattern={index === 0 ? 'Solid' : kits.awayPattern}
+                    style={{
+                      left: x + '%',
+                      top: y + '%',
+                      ...kitStyle(index === 0 ? kits.awayKeeper : kits.away),
+                    }}
+                    title={
+                      'Opponent ' + (index + 1) + (index === 0 ? ' · GK' : '')
+                    }
+                  >
+                    {index + 1}
+                  </span>
+                ))}
                 {starters.map((slot) => cardButton(slot, true))}
               </div>
             </div>
@@ -750,17 +856,21 @@ export default function SquadStudio() {
                   {label}
                 </button>
               ))}
-              {setup.marks.length > 0 && (
+              {(first || setup.marks.length > 0) && (
                 <button
                   type="button"
-                  aria-label="Undo last pitch marking"
-                  title="Undo last pitch marking"
-                  onClick={() =>
-                    updatePhase((current) => ({
-                      ...current,
-                      marks: current.marks.slice(0, -1),
-                    }))
+                  aria-label={
+                    first ? 'Cancel drawing' : 'Undo last pitch marking'
                   }
+                  title={first ? 'Cancel drawing' : 'Undo last pitch marking'}
+                  onClick={() => {
+                    if (!first)
+                      updatePhase((current) => ({
+                        ...current,
+                        marks: current.marks.slice(0, -1),
+                      }));
+                    resetInteraction();
+                  }}
                 >
                   <Undo2 size={16} />
                 </button>
@@ -769,12 +879,22 @@ export default function SquadStudio() {
             <p className="studio-help" role="status">
               {message ||
                 (tool === 'move'
-                  ? 'Drag to position or switch players. Tap a card for instructions.'
+                  ? 'Drag to position. Tap a card for instructions.'
                   : tool === 'swap'
                     ? 'Tap two slots to switch players, including the bench and reserves.'
-                    : first
-                      ? 'Select the end point.'
-                      : 'Select a starting point on the pitch.')}
+                    : tool === 'curve'
+                      ? !first
+                        ? 'Select the start of the run.'
+                        : !bend
+                          ? 'Select where the run bends.'
+                          : 'Select the end of the run.'
+                      : tool === 'circle'
+                        ? first
+                          ? 'Select the edge of the circle.'
+                          : 'Select the centre of the circle.'
+                        : first
+                          ? 'Select the end point.'
+                          : 'Select a starting point on the pitch.')}
             </p>
           </section>
 
@@ -1058,11 +1178,26 @@ export default function SquadStudio() {
                           <label className="studio-field" key={label}>
                             <span>{label}</span>
                             <select
-                              value={selectedInstruction?.choices[label] ?? ''}
+                              value={
+                                label === 'Marking'
+                                  ? markingMode
+                                  : (selectedInstruction?.choices[label] ?? '')
+                              }
                               onChange={(event) => {
                                 const value = event.target.value;
                                 updateInstruction(dialog.slot, (current) => ({
                                   ...current,
+                                  ...(label === 'Marking' && {
+                                    mark:
+                                      value === 'Man mark' ||
+                                      value === 'Tight mark'
+                                        ? current.mark
+                                        : undefined,
+                                    markZone:
+                                      value === 'Zonal'
+                                        ? current.markZone
+                                        : undefined,
+                                  }),
                                   choices: {
                                     ...current.choices,
                                     [label]: value,
@@ -1078,29 +1213,76 @@ export default function SquadStudio() {
                           </label>
                         )
                       )}
-                    {phase === 'defend' && selectedSpot.position !== 'GK' && (
-                      <label className="studio-field">
-                        <span>Mark opponent</span>
-                        <select
-                          value={selectedInstruction?.mark ?? ''}
-                          onChange={(event) => {
-                            const mark =
-                              Number(event.target.value) || undefined;
-                            updateInstruction(dialog.slot, (current) => ({
-                              ...current,
-                              mark,
-                            }));
-                          }}
-                        >
-                          <option value="">None</option>
-                          {starters.map((slot) => (
-                            <option key={slot} value={slot + 1}>
-                              Opponent {slot + 1}
+                    {phase === 'defend' &&
+                      selectedSpot.position !== 'GK' &&
+                      (markingMode === 'Man mark' ||
+                        markingMode === 'Tight mark') && (
+                        <label className="studio-field">
+                          <span>Mark opponent</span>
+                          <select
+                            value={
+                              selectedInstruction?.markFormation ===
+                                undefined ||
+                              selectedInstruction.markFormation === opposition
+                                ? (selectedInstruction?.mark ?? '')
+                                : ''
+                            }
+                            disabled={!opponents.length}
+                            onChange={(event) => {
+                              const mark =
+                                Number(event.target.value) || undefined;
+                              updateInstruction(dialog.slot, (current) => ({
+                                ...current,
+                                mark,
+                                markFormation: opposition,
+                                choices: {
+                                  ...current.choices,
+                                  Marking: markingMode,
+                                },
+                              }));
+                            }}
+                          >
+                            <option value="">
+                              {opponents.length
+                                ? 'Choose opponent'
+                                : 'Enable an opposition formation'}
                             </option>
-                          ))}
-                        </select>
-                      </label>
-                    )}
+                            {opponents.map((_, slot) => (
+                              <option key={slot} value={slot + 1}>
+                                Opponent {slot + 1}
+                                {slot === 0 ? ' · GK' : ''}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      )}
+                    {phase === 'defend' &&
+                      selectedSpot.position !== 'GK' &&
+                      markingMode === 'Zonal' && (
+                        <label className="studio-field">
+                          <span>Marking zone</span>
+                          <select
+                            value={selectedInstruction?.markZone ?? ''}
+                            onChange={(event) => {
+                              const markZone =
+                                event.target.value === ''
+                                  ? undefined
+                                  : Number(event.target.value);
+                              updateInstruction(dialog.slot, (current) => ({
+                                ...current,
+                                markZone,
+                              }));
+                            }}
+                          >
+                            <option value="">Choose zone</option>
+                            {markingZones.map(({ label }, index) => (
+                              <option key={label} value={index}>
+                                {label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      )}
                   </div>
                   {selectedInstruction?.role && (
                     <p className="studio-role-note">

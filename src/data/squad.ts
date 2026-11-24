@@ -38,6 +38,7 @@ export type Edition = {
 export type PlayerProfile = {
   id: string;
   name: string;
+  aliases?: string[];
   description?: string;
   image?: string;
   imageSource?: string;
@@ -47,18 +48,21 @@ export type PlayerProfile = {
 };
 export type SquadCard = Omit<PlayerProfile, 'editions'> & { edition?: Edition };
 
-type Point = { x: number; y: number };
+export type Point = { x: number; y: number };
 export type PositionSlot = Point & { position: Position };
 type Instruction = {
   role?: string;
   choices: Record<string, string>;
   mark?: number;
+  markFormation?: number;
+  markZone?: number;
   notes?: string;
 };
 export type BoardMark = {
   start: Point;
   end: Point;
-  type: 'run' | 'pass' | 'press' | 'zone';
+  bend?: Point;
+  type: 'run' | 'pass' | 'press' | 'zone' | 'curve' | 'circle';
 };
 export type PhaseSetup = {
   formation: Formation;
@@ -71,7 +75,81 @@ export type Squad = {
   name: string;
   cards: Record<number, SquadCard>;
   setups: Record<Phase, PhaseSetup>;
+  opposition?: number;
+  kits?: Partial<KitSelection>;
+  showLanes?: boolean;
 };
+
+export const kitColors = {
+  Blue: ['#3785f9', '#173167'],
+  Red: ['#ef4b65', '#681b35'],
+  White: ['#eef2ff', '#646e91'],
+  Black: ['#35394c', '#090c19'],
+  Lime: ['#afd950', '#395126'],
+  Gold: ['#ffbf4b', '#743c1c'],
+} as const;
+export const outfieldColors = ['Blue', 'Red', 'White', 'Black'] as const;
+export const keeperColors = [
+  'Lime',
+  'Gold',
+  'White',
+  'Black',
+  'Blue',
+  'Red',
+] as const;
+export const kitPatterns = ['Solid', 'Stripes', 'Hoops'] as const;
+type KitSelection = {
+  home: keyof typeof kitColors;
+  away: keyof typeof kitColors;
+  homeKeeper: keyof typeof kitColors;
+  awayKeeper: keyof typeof kitColors;
+  homePattern: (typeof kitPatterns)[number];
+  awayPattern: (typeof kitPatterns)[number];
+};
+export const defaultKits: KitSelection = {
+  home: 'Blue',
+  away: 'Red',
+  homeKeeper: 'Lime',
+  awayKeeper: 'Gold',
+  homePattern: 'Solid',
+  awayPattern: 'Solid',
+};
+
+export const pitchLanes = [
+  'Left wing',
+  'Left half-space',
+  'Centre',
+  'Right half-space',
+  'Right wing',
+];
+export const markingZones = [
+  'Defensive third',
+  'Middle third',
+  'Attacking third',
+].flatMap((third, row) =>
+  pitchLanes.map((lane, column) => ({
+    label: third + ' · ' + lane,
+    x: 3 + column * (94 / 5),
+    y: 97 - (row + 1) * (94 / 3),
+    width: 94 / 5,
+    height: 94 / 3,
+  }))
+);
+
+export function detectShape(spots: PositionSlot[]) {
+  const depths = spots
+    .slice(1)
+    .map(({ y }) => y)
+    .sort((a, b) => b - a);
+  const lines: { back: number; count: number }[] = [];
+  for (const depth of depths) {
+    const line = lines[lines.length - 1];
+    // Measure from the deepest player so a chain of staggered players cannot bridge two lines.
+    if (line && line.back - depth <= 9) line.count++;
+    else lines.push({ back: depth, count: 1 });
+  }
+  return lines.map(({ count }) => count).join('-');
+}
 
 const presets = {
   '4-3-3': [
@@ -92,8 +170,7 @@ const presets = {
   ],
   '3-5-2': [
     ['ST', 'ST'],
-    ['CAM'],
-    ['LWB', 'CDM', 'CDM', 'RWB'],
+    ['LWB', 'CDM', 'CAM', 'CDM', 'RWB'],
     ['CB', 'CB', 'CB'],
   ],
   '3-4-3': [
@@ -130,7 +207,11 @@ export function shape(formation: Formation): PositionSlot[] {
         y:
           74 -
           (57 * row) / (lines.length - 1) +
-          (position === 'CDM' && lines.length === 3 ? 7 : 0),
+          (formation === '3-5-2' && position === 'CAM'
+            ? -2
+            : position === 'CDM' && lines.length === 3
+              ? 7
+              : 0),
       }))
     ),
   ];

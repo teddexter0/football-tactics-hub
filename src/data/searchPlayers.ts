@@ -8,10 +8,12 @@ type WikiPage = {
   pageimage?: string;
   thumbnail?: { source: string };
   terms?: { description?: string[] };
+  extract?: string;
+  pageprops?: { disambiguation?: string };
 };
 
 const footballer =
-  /footballer|soccer player|football (?:player|goalkeeper|forward|midfielder|defender|striker|winger|manager|coach)/i;
+  /footballer|soccer player|football (?:player|goalkeeper|forward|midfielder|defender|striker|winger)|(?:association football|soccer)\s+(?:player|goalkeeper|forward|midfielder|defender|striker|winger)/i;
 
 function positionFromDescription(description: string): Position | undefined {
   const clues: [RegExp, Position][] = [
@@ -33,14 +35,80 @@ function normalize(value: string) {
   return value
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ł/g, 'l')
+    .replace(/ø/g, 'o')
+    .replace(/ß/g, 'ss')
+    .replace(/['’]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim();
+}
+
+function editDistance(a: string, b: string) {
+  const distances = Array.from({ length: a.length + 1 }, (_, i) =>
+    Array.from({ length: b.length + 1 }, (_, j) =>
+      i === 0 ? j : j === 0 ? i : 0
+    )
+  );
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      distances[i][j] = Math.min(
+        distances[i - 1][j] + 1,
+        distances[i][j - 1] + 1,
+        distances[i - 1][j - 1] + Number(a[i - 1] !== b[j - 1])
+      );
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        distances[i][j] = Math.min(
+          distances[i][j],
+          distances[i - 2][j - 2] + 1
+        );
+      }
+    }
+  }
+  return distances[a.length][b.length];
+}
+
+function nameScore(key: string, name: string) {
+  const value = normalize(name);
+  if (value === key) return 0;
+  if (value.startsWith(key + ' ')) return 1;
+  const nameWords = value.split(' ');
+  const words = key.split(' ');
+  if (words.every((word) => nameWords.includes(word))) return 2;
+  if (words.every((word) => nameWords.some((part) => part.startsWith(word))))
+    return 3;
+  if (
+    words.every((word) =>
+      nameWords.some(
+        (part) =>
+          word === part ||
+          (word.length >= 4 &&
+            Math.abs(word.length - part.length) <= 2 &&
+            editDistance(word, part) <= (word.length >= 8 ? 2 : 1))
+      )
+    )
+  )
+    return 4;
+  return value.includes(key) ? 5 : 6;
+}
+
+function playerScore(key: string, player: PlayerProfile) {
+  return Math.min(
+    ...[player.name, ...(player.aliases ?? [])].map((name) =>
+      nameScore(key, name)
+    )
+  );
 }
 
 export function localPlayers(query: string) {
+  if (!query.trim()) return featuredPlayers;
   const key = normalize(query);
-  return featuredPlayers.filter((player) =>
-    normalize(player.id + ' ' + player.description).includes(key)
-  );
+  if (!key) return [];
+  return featuredPlayers
+    .map((player) => ({ player, score: playerScore(key, player) }))
+    .filter(({ score }) => score < 6)
+    .sort((a, b) => a.score - b.score)
+    .map(({ player }) => player);
 }
 
 function wikiProfile(page: WikiPage): PlayerProfile {
@@ -76,7 +144,12 @@ async function searchWiki(
     formatversion: '2',
     origin: '*',
     redirects: '1',
-    prop: 'pageimages|pageterms|info',
+    prop: 'pageimages|pageterms|info|pageprops|extracts',
+    ppprop: 'disambiguation',
+    exintro: '1',
+    explaintext: '1',
+    exsentences: '2',
+    exlimit: '20',
     inprop: 'url',
     wbptterms: 'description',
     pithumbsize: '250',
@@ -99,51 +172,60 @@ async function searchWiki(
 
 export async function searchPlayers(query: string, signal: AbortSignal) {
   const featured = localPlayers(query);
-  const exact = featured.length
-    ? searchWiki(
-        { titles: featured.map((player) => player.id).join('|') },
-        signal
-      )
-    : Promise.resolve([]);
-  const search = query
-    ? searchWiki(
-        {
-          generator: 'search',
-          gsrsearch: query.replace(/["{}\[\]<>:*|]/g, ' ') + ' footballer',
-          gsrlimit: '24',
-          gsrnamespace: '0',
-        },
-        signal
-      )
-    : Promise.resolve([]);
-  const [exactResult, searchResult] = await Promise.allSettled([exact, search]);
-  if ((query ? searchResult : exactResult).status === 'rejected')
+  const key = normalize(query);
+  if (!key) return featured;
+
+  const results = await Promise.allSettled([
+    searchWiki(
+      {
+        generator: 'prefixsearch',
+        gpssearch: key,
+        gpslimit: '20',
+        gpsnamespace: '0',
+      },
+      signal
+    ),
+    searchWiki(
+      {
+        generator: 'search',
+        gsrsearch: key + ' footballer',
+        gsrlimit: '20',
+        gsrnamespace: '0',
+      },
+      signal
+    ),
+  ]);
+  if (results.every((result) => result.status === 'rejected'))
     throw new Error('Player search unavailable');
-  const pages = searchResult.status === 'fulfilled' ? searchResult.value : [];
-  const exactPages =
-    exactResult.status === 'fulfilled' ? exactResult.value : [];
-  const seen = new Set<string>();
-  return [
-    ...featured.map((player) => {
-      seen.add(player.id);
-      const page = [...exactPages, ...pages].find(
-        (item) => item.title === player.id
-      );
-      if (!page) return player;
-      const wiki = wikiProfile(page);
-      return {
-        ...player,
-        image: player.image ?? wiki.image,
-        imageSource: player.imageSource ?? wiki.imageSource,
-        source: wiki.source ?? player.source,
-      };
-    }),
-    ...pages
-      .filter(
-        (page) =>
-          !seen.has(page.title) &&
-          footballer.test(page.terms?.description?.[0] ?? '')
+  const players = new Map(
+    featured.map((player) => [normalize(player.id), player])
+  );
+  for (const result of results) {
+    if (result.status === 'rejected') continue;
+    for (const page of result.value) {
+      const existing = players.get(normalize(page.title));
+      if (
+        'disambiguation' in (page.pageprops ?? {}) ||
+        (!existing &&
+          !footballer.test(
+            (page.terms?.description?.[0] ?? '') + ' ' + (page.extract ?? '')
+          ))
       )
-      .map(wikiProfile),
-  ];
+        continue;
+      const wiki = wikiProfile(page);
+      players.set(
+        normalize(page.title),
+        existing
+          ? {
+              ...existing,
+              image: existing.image ?? wiki.image,
+              imageSource: existing.imageSource ?? wiki.imageSource,
+            }
+          : wiki
+      );
+    }
+  }
+  return [...players.values()]
+    .sort((a, b) => playerScore(key, a) - playerScore(key, b))
+    .slice(0, 32);
 }

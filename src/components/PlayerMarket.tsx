@@ -46,7 +46,7 @@ export default function PlayerMarket({
   const [onlyPosition, setOnlyPosition] = useState(false);
   const preview = useRef<HTMLDivElement>(null);
   const query = input.trim();
-  const isSearching = query.length !== 1 && result?.query !== query;
+  const isSearching = query.length > 1 && result?.query !== query;
   const players =
     query.length === 1
       ? []
@@ -68,26 +68,30 @@ export default function PlayerMarket({
     visible.find((edition) => edition.id === editionId) ?? visible[0];
 
   useEffect(() => {
-    if (query.length === 1) return;
+    if (query.length < 2) return;
     const controller = new AbortController();
+    const useFallback = () =>
+      setResult({ query, players: localPlayers(query), failed: true });
+    const deadline = window.setTimeout(() => {
+      controller.abort();
+      useFallback();
+    }, 8500);
     const timeout = window.setTimeout(
       () => {
-        searchPlayers(
-          query,
-          AbortSignal.any([controller.signal, AbortSignal.timeout(8500)])
-        )
+        searchPlayers(query, controller.signal)
           .then((players) => {
             if (!controller.signal.aborted) setResult({ query, players });
           })
           .catch(() => {
-            if (!controller.signal.aborted)
-              setResult({ query, players: localPlayers(query), failed: true });
-          });
+            if (!controller.signal.aborted) useFallback();
+          })
+          .finally(() => clearTimeout(deadline));
       },
       query ? 250 : 0
     );
     return () => {
       clearTimeout(timeout);
+      clearTimeout(deadline);
       controller.abort();
     };
   }, [query]);
@@ -101,7 +105,7 @@ export default function PlayerMarket({
           type="search"
           maxLength={90}
           aria-label="Search footballers"
-          placeholder="Search footballers by name"
+          placeholder="Search by name or nickname"
           value={input}
           onChange={(event) => {
             setInput(event.target.value);
@@ -116,8 +120,8 @@ export default function PlayerMarket({
           ? 'Searching for players…'
           : query.length === 1
             ? 'Enter at least two characters.'
-            : result?.failed
-              ? 'Wikipedia search is unavailable. Featured cards are still searchable.'
+            : result?.query === query && result.failed
+              ? 'Online search is unavailable. Showing built-in results.'
               : query
                 ? players.length +
                   (players.length === 1 ? ' result' : ' results')
