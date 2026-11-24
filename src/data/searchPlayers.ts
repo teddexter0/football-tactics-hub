@@ -46,9 +46,11 @@ export function localPlayers(query: string) {
 function wikiProfile(page: WikiPage): PlayerProfile {
   const description = page.terms?.description?.[0] ?? '';
   const image = page.thumbnail?.source;
-  const commons = image?.startsWith(
-    'https://upload.wikimedia.org/wikipedia/commons/'
-  );
+  const commons =
+    image &&
+    /^https:\/\/(?:upload|thumb)\.wikimedia\.org\/wikipedia\/commons\//.test(
+      image
+    );
   return {
     id: page.title,
     name: page.title.replace(/ \(.*\)$/, ''),
@@ -77,7 +79,7 @@ async function searchWiki(
     prop: 'pageimages|pageterms|info',
     inprop: 'url',
     wbptterms: 'description',
-    pithumbsize: '240',
+    pithumbsize: '250',
     pilimit: '24',
     pilicense: 'free',
     piprop: 'thumbnail|name',
@@ -131,8 +133,8 @@ export async function searchPlayers(query: string, signal: AbortSignal) {
       const wiki = wikiProfile(page);
       return {
         ...player,
-        image: wiki.image ?? player.image,
-        imageSource: wiki.imageSource ?? player.imageSource,
+        image: player.image ?? wiki.image,
+        imageSource: player.imageSource ?? wiki.imageSource,
         source: wiki.source ?? player.source,
       };
     }),

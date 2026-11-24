@@ -1,18 +1,20 @@
 'use client';
 
 import { Plus, User } from 'lucide-react';
+import { featuredPortrait } from '@/data/featuredPlayers';
 import type { SquadCard } from '@/data/squad';
 
 export function CardFace({ card }: { card: SquadCard }) {
+  const image = card.image ?? featuredPortrait(card.id).image;
   return (
     <span className="studio-face" aria-hidden>
       <User />
-      {card.image && (
+      {image && (
         // Wikimedia file links are shown with the full card details.
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          key={card.image}
-          src={card.image}
+          key={image}
+          src={image}
           alt=""
           decoding="async"
           draggable={false}
@@ -59,6 +61,7 @@ export function CardTile({
 }
 
 export function RatingDetails({ card }: { card: SquadCard }) {
+  const imageSource = card.imageSource ?? featuredPortrait(card.id).imageSource;
   return (
     <div className="studio-rating">
       {card.edition && (
@@ -87,8 +90,8 @@ export function RatingDetails({ card }: { card: SquadCard }) {
             Player profile ↗
           </a>
         )}
-        {card.imageSource && (
-          <a href={card.imageSource} target="_blank" rel="noreferrer">
+        {imageSource && (
+          <a href={imageSource} target="_blank" rel="noreferrer">
             Photo &amp; license ↗
           </a>
         )}

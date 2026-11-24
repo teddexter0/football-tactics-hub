@@ -36,6 +36,7 @@ import {
   reserves,
   shape,
   starters,
+  normalizePosition,
   type BoardMark,
   type Phase,
   type Squad,
@@ -50,7 +51,8 @@ const initial = {
 };
 type SavedSquads = typeof initial;
 type Dialog =
-  | { kind: 'player' | 'search'; slot: number }
+  | { kind: 'player'; slot: number }
+  | { kind: 'search'; slot?: number }
   | { kind: 'new' | 'delete' };
 type Tool = 'move' | 'swap' | BoardMark['type'];
 type Point = BoardMark['start'];
@@ -310,7 +312,42 @@ export default function SquadStudio() {
     setMessage(slotName(from) + ' and ' + slotName(to) + ' switched.');
   }
 
-  function choosePlayer(slot: number, card: SquadCard) {
+  function addPlayer(card: SquadCard, target?: number) {
+    const available = starters.filter((slot) => !squad.cards[slot]);
+    const cardPosition = card.edition?.position ?? card.position;
+    const existing = Object.keys(squad.cards)
+      .map(Number)
+      .find((slot) => squad.cards[slot].id === card.id);
+    const samePosition = available.find(
+      (slot) => setup.spots[slot].position === cardPosition
+    );
+    const similarPosition = cardPosition
+      ? available.find(
+          (slot) =>
+            normalizePosition(setup.spots[slot].position) ===
+            normalizePosition(cardPosition)
+        )
+      : undefined;
+    const nextOutfield = available.find(
+      (slot) => setup.spots[slot].position !== 'GK'
+    );
+    const nextBench = [...bench, ...reserves].find(
+      (slot) => !squad.cards[slot]
+    );
+    const slot =
+      target ??
+      existing ??
+      samePosition ??
+      similarPosition ??
+      nextOutfield ??
+      nextBench ??
+      available[0];
+    if (slot === undefined) {
+      setMessage('Squad is full. Select a card to replace a player.');
+      closeDialog();
+      return;
+    }
+
     updateSquad((current) => {
       const cards = { ...current.cards, [slot]: card };
       const duplicate = Object.keys(current.cards)
@@ -545,13 +582,13 @@ export default function SquadStudio() {
     );
   }
 
-  const selectedSlot = dialog && 'slot' in dialog ? dialog.slot : null;
+  const selectedSlot = dialog && 'slot' in dialog ? dialog.slot : undefined;
   const selectedCard =
-    selectedSlot !== null ? squad.cards[selectedSlot] : undefined;
+    selectedSlot !== undefined ? squad.cards[selectedSlot] : undefined;
   const selectedSpot =
-    selectedSlot !== null ? setup.spots[selectedSlot] : undefined;
+    selectedSlot !== undefined ? setup.spots[selectedSlot] : undefined;
   const selectedInstruction =
-    selectedSlot !== null
+    selectedSlot !== undefined
       ? setup.instructions[selectedCard?.id ?? 'slot:' + selectedSlot]
       : undefined;
 
@@ -750,12 +787,7 @@ export default function SquadStudio() {
               <button
                 type="button"
                 className="studio-primary"
-                onClick={() => {
-                  const next = [...starters, ...bench, ...reserves].find(
-                    (slot) => !squad.cards[slot]
-                  );
-                  openDialog({ kind: 'search', slot: next ?? 0 });
-                }}
+                onClick={() => openDialog({ kind: 'search' })}
               >
                 <Search size={15} /> Find player
               </button>
@@ -904,15 +936,17 @@ export default function SquadStudio() {
           <Popup
             key="search"
             title={
-              'Find a player · ' +
-              (selectedSpot?.position ?? slotName(dialog.slot))
+              dialog.slot === undefined
+                ? 'Find a player'
+                : 'Find a player · ' +
+                  (selectedSpot?.position ?? slotName(dialog.slot))
             }
             close={closeDialog}
           >
             <PlayerMarket
               position={selectedSpot?.position}
               current={selectedCard}
-              onPick={(card) => choosePlayer(dialog.slot, card)}
+              onPick={(card) => addPlayer(card, dialog.slot)}
             />
           </Popup>
         )}

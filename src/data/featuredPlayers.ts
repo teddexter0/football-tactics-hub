@@ -1,5 +1,41 @@
 import type { Edition, PlayerProfile, Position } from '@/data/squad';
 
+const portraits: Record<string, [file: string, directory: string]> = {
+  'Lionel Messi': ['Lionel_Messi_2018.jpg', 'b/b0'],
+  'Cristiano Ronaldo': ['Cristiano_Ronaldo_in_2018.jpg', '3/32'],
+  Neymar: ['Neymar_2018.jpg', 'd/d0'],
+  'Kylian Mbappé': ['Kylian_Mbappé_2018.jpg', 'e/e5'],
+  Pelé: ['Pele_celebrating_1970_(cropped).jpg', '8/88'],
+  Ronaldinho: ['Ronaldinho_Gaúcho_em_junho_de_2019_(cropped).jpg', '5/5b'],
+  'Diego Maradona': ['Diego_Maradona_on_29_June_1986.jpg', '8/8b'],
+  'Ronaldo (Brazilian footballer)': [
+    'Ronaldo_Luís_Nazário_de_Lima_2019_(3x4_cropped).jpg',
+    '7/78',
+  ],
+  'Zinedine Zidane': ['Zinedine_Zidane_by_Tasnim_01.jpg', '8/82'],
+  'Thierry Henry': ['Thierry_Henry_2008.jpg', '6/6e'],
+  'Paolo Maldini': ['PaoloMaldini.jpg', '1/1c'],
+  'Lev Yashin': ['Lev_Yashin.jpg', 'a/a3'],
+  'Johan Cruyff': ['Johan_Cruijff_cropped.jpg', '2/28'],
+  'David Beckham': ['Beckswimbledon.jpg', '9/9e'],
+  'Carles Puyol': ['Carles_Puyol_Joan_Gamper-Tr.jpg', '6/60'],
+};
+
+export function featuredPortrait(title: string) {
+  const entry = portraits[title];
+  if (!Object.prototype.hasOwnProperty.call(portraits, title)) return {};
+  const [filename, directory] = entry;
+  const file = encodeURIComponent(filename);
+  return {
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/' +
+      directory +
+      '/' +
+      file,
+    imageSource: 'https://commons.wikimedia.org/wiki/File:' + file,
+  };
+}
+
 const outfield = ['PAC', 'SHO', 'PAS', 'DRI', 'DEF', 'PHY'];
 const goalkeeper = ['DIV', 'HAN', 'KIC', 'REF', 'SPD', 'POS'];
 
@@ -30,6 +66,7 @@ function profile(
   ...editions: Edition[]
 ): PlayerProfile {
   return {
+    ...featuredPortrait(title),
     id: title,
     name: title.replace(' (Brazilian footballer)', ''),
     source:
